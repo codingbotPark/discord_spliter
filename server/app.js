@@ -8,7 +8,7 @@ import {
   ButtonStyleTypes,
   verifyKeyMiddleware,
 } from 'discord-interactions';
-import { getRandomEmoji, DiscordRequest } from './utils.js';
+import { getRandomEmoji, DiscordRequest } from './src/middlewares/utils.js';
 import { getShuffledOptions, getResult } from './game.js';
 
 // Create an express app
@@ -176,11 +176,12 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
         }
       }
     }
-  } else{
-    console.error('unknown interaction type', type);
-    return res.status(400).json({ error: 'unknown interaction type' });
+
+    return
   }
 
+  console.error('unknown interaction type', type);
+  return res.status(400).json({ error: 'unknown interaction type' });
 });
 
 app.listen(PORT, () => {
