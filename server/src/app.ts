@@ -2,22 +2,27 @@ import express, {Express} from 'express'
 import { Server } from 'http';
 import 'dotenv/config';
 import Logger from './util/Logger';
+import { verifyKeyMiddleware } from 'discord-interactions';
 
 // App class role = turn on & off express server
 class App {
     private app:Express
-    private server:Server | null = null
+    private server:Server | undefined = undefined
     private logger:Logger
 
     constructor(){
         this.app = express()
         this.logger = new Logger
-        this.initializeMiddleware()
+        this.initializeMiddleware() // base middleware (ex logger)
+        this.initializeRoute() // base route('interactions' for use discord endpoint)
     }
 
     private initializeMiddleware(){
-        this.app.use(express.json()) // use json
         this.app.use(this.logger.logMiddleware) // use logging for every request
+    }
+
+    private initializeRoute(){
+        this.app.route('/interactions', )
     }
 
     private getPort(presetPort:number):number{
@@ -35,8 +40,10 @@ class App {
         })
     }
 
-    publiccloseServer(){
-        this.server?.close()
+    closeServer(){
+        this.server?.close(() => {
+            // logging for closing server
+        })
     }
 
 }
