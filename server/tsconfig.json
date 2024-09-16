@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",                   // 최신 JavaScript로 트랜스파일링
+        "module": "commonjs",                 // Node.js에서는 commonjs 모듈을 사용
+        "strict": true,                       // 엄격한 타입 체크
+        "esModuleInterop": true,              // ES 모듈과 호환 가능하게 설정
+        "forceConsistentCasingInFileNames": true, // 대소문자 일관성 유지
+        "skipLibCheck": true,                 // 타입 정의 검사 스킵 (빌드 속도 개선)
+        "outDir": "./dist",                   // 컴파일된 파일의 출력 경로
+        "rootDir": "./src",                   // 소스 코드 경로
+        "resolveJsonModule": true             // JSON 파일 import 가능하게 설정
+    },
+    "include": [
+        "src/**/*",
+    ],
+    "exclude": [
+        "node_modules",
+    ]
+}
+  
