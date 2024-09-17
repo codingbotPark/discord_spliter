@@ -5,7 +5,7 @@ import Logger from './util/Logger';
 import InteractionRouter from './routers/InteractionRouter';
 import Router from './routers/Router';
 
-// App class role = turn on & off express server
+// App class role = set & run server
 class App {
     private app:Express
     private server:Server | undefined = undefined

@@ -8,8 +8,8 @@ class InteractionRouter extends Router {
     }
 
     initializeRoutes(): void {
-        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY), 로직1)
-        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY), 로직2)
+        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
+        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
     }
 }
 
