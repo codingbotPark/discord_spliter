@@ -12,6 +12,7 @@
     },
     "include": [
         "src/**/*",
+        "process-env.d.ts"
     ],
     "exclude": [
         "node_modules",

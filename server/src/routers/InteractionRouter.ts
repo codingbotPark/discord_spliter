@@ -1,11 +1,13 @@
-import Router from "./Router";
+    import 'dotenv/config';
+    import { verifyKeyMiddleware } from "discord-interactions";
+    import Router from "./Router";
 
-class InteractionRouter extends Router{
-    constructor(){
-        super('/interactions')
+    class InteractionRouter extends Router{
+        constructor(){
+            super('/interactions')
+        }
+        
+        initializeRoutes(): void {
+            this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
+        }
     }
-    
-    initializeRoutes(): void {
-        this.registRoute('post', '', [],)
-    }
-}
