@@ -8,11 +8,10 @@ class RouterManager{
         this.routers = routers
     }
     registRoutes(app:Express){
-        this.routers?.forEach((router:Router) => {
-            router.initializeRoutes()
+        this.routers.forEach((router:Router) => {
+            router.setRoutes()
             app.use(router.basePath, router.getRouter())
         })
-        
     }
 }
 

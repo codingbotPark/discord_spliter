@@ -7,9 +7,9 @@ class InteractionRouter extends Router {
         super('/interactions')
     }
 
-    initializeRoutes(): void {
-        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
-        this.registRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
+    setRoutes(): void {
+        this.setRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
+        this.setRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
     }
 }
 

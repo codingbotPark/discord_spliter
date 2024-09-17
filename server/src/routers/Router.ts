@@ -3,6 +3,7 @@ import { Handler, Router as ExpressRouter, RequestHandler, IRouterMatcher } from
 
 // router class role = routing to service or middleware
 // router is-a [something]Router => abstract class
+
 abstract class Router{
     basePath:string
     expressRouter:ExpressRouter
@@ -11,12 +12,12 @@ abstract class Router{
         this.expressRouter = ExpressRouter({strict:true}) // return express core.router
     }
 
-    protected registRoute(method:HTTPMethod, subPath:string, ...handlers:RequestHandler[]){
+    protected setRoute(method:HTTPMethod, subPath:string, ...handlers:RequestHandler[]){
         this.expressRouter[method](subPath, handlers)
     }
 
-    // regist route
-    abstract initializeRoutes():void
+    // set Routes using set Route method
+    abstract setRoutes():void
 
     getRouter():ExpressRouter{
         return this.expressRouter
