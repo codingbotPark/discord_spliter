@@ -1,6 +1,7 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Router } from "express";
+import { HTTPMethod, isHTTPMethod } from "../util/isHttpMethod";
 
-class RouteBuilder{
+class RouterBuilder{
     private subPath:string = ""
     private method:HTTPMethod | undefined;
     private handlers:RequestHandler[] | [] = []
@@ -24,15 +25,16 @@ class RouteBuilder{
         if(!this.handlers.length){
             // need at least 1 length
         }
-        if(!this.method){
+        if(!isHTTPMethod(this.method)){
             // have to define method
+            return
         }
-        
+
+        return Router()[this.method](this.subPath).use(this.handlers)
     }
 
 }
 
 /** @TODO make http method to enum */
-type HTTPMethod = "all" | "get" | "post" | "put" | "delete" | "patch" | "options" | "head"
 
-export default RouteBuilder
+export default RouterBuilder
