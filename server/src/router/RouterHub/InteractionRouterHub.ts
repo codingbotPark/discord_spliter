@@ -11,7 +11,12 @@ class InteractionRouterHub extends RouterHub {
 
     setRouters(): void {
         const routerBuilder = new RouterBuilder()
-        this.addRouter(routerBuilder.setMethod(HTTPMethod.POST).addHandler(verifyKeyMiddleware(process.env.PUBLIC_KEY)).addHandler(() => console.log("test")).build())
+        this.addRouter(
+            routerBuilder
+            .setMethod(HTTPMethod.POST)
+            .addHandler(verifyKeyMiddleware(process.env.PUBLIC_KEY))
+            .addHandler(() => console.log("test")).build()
+        )
     }
 }
 

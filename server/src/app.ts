@@ -1,9 +1,5 @@
 import express, {Express} from 'express'
-import { Server } from 'http';
 import 'dotenv/config';
-import InteractionRouter from './router/RouterHub/InteractionRouterHub';
-import Router from './router/RouterHub/RouterHub';
-import RouterManager from './RouterManager';
 import ServerManager from './ServerManager';
 
 // App class role = start & stop app
