@@ -1,8 +1,8 @@
 import { Router } from "express";
 
 
-// router class role = set Routers with middleware
-// router is-a [something]Router => abstract class
+// RouterHub class role = set Routers with middleware & provide routers to routerManager
+// RouterHub is-a [something]RouterHub => abstract class
 abstract class RouterHub{
     routers:Router[] = []
     basePath:string;

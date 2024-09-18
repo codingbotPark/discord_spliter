@@ -2,7 +2,7 @@ import RouterHub from "./router/RouterHub/RouterHub";
 import RouterHubs from "./router/RouterHub/RouterHub";
 import { Express, Router } from "express";
 
-// RouterManager class role = assign routers to app
+// RouterManager class role = set Routers to app
 class RouterManager{
     routerHubs:RouterHubs[]
     constructor(routerHubs:RouterHubs[]){

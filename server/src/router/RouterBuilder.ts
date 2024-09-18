@@ -1,6 +1,7 @@
 import { RequestHandler, Router } from "express";
 import { HTTPMethod, isHTTPMethod } from "../util/httpMethod";
 
+// RouterBuilder class role = builder for setting up router to RouterHub
 class RouterBuilder{
     private subPath:string = ""
     private method:HTTPMethod | undefined;
