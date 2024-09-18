@@ -1,26 +1,24 @@
 import { Router } from "express";
 
 
-// router class role = routing to service or middleware
+// router class role = set Routers with middleware
 // router is-a [something]Router => abstract class
-
 abstract class RouterHub{
     routers:Router[] = []
     basePath:string;
-    
+
     constructor(basePath:string = ""){
         this.basePath = basePath
     }
 
     // set Routes using addRouter method
-    abstract setRouters():void
+    protected abstract setRouters():void
 
-    protected getRouters(){
+    getRouters(){
         return this.routers
     }
     
     protected addRouter(router:Router){
-        
         this.routers.push(router)
     }
 

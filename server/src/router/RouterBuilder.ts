@@ -27,13 +27,14 @@ class RouterBuilder{
         return this
     }
 
-    build(){
+    build():Router{
         if(!this.handlers.length){
             // need at least 1 length
+            return Router()
         }
         if(!isHTTPMethod(this.method)){
             // have to define method
-            return
+            return Router()
         }
 
         const router = Router({strict:true})[this.method](this.subPath).use(this.handlers)
@@ -41,8 +42,8 @@ class RouterBuilder{
         return router
     }
 
-}
+    /** @TODO add err handler */
 
-/** @TODO make http method to enum */
+}
 
 export default RouterBuilder

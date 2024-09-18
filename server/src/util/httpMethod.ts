@@ -8,9 +8,8 @@ export enum HTTPMethod {
     OPTIONS = "options",
     HEAD = "head"
 }
-
-
 const httpMethod = Object.values(HTTPMethod)
+
 // const httpMethod = ["all", "get", "post", "put", "delete", "patch", "options", "head"] as const
 // export type HTTPMethod = typeof httpMethod[number] // make methods to union 
 

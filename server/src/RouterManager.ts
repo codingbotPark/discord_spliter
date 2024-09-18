@@ -1,16 +1,18 @@
-import Router from "./routes/RouterHub";
-import { Express } from "express";
+import RouterHub from "./router/RouterHub/RouterHub";
+import RouterHubs from "./router/RouterHub/RouterHub";
+import { Express, Router } from "express";
 
 // RouterManager class role = assign routers to app
 class RouterManager{
-    routers:Router[]
-    constructor(routers:Router[]){
-        this.routers = routers
+    routerHubs:RouterHubs[]
+    constructor(routerHubs:RouterHubs[]){
+        this.routerHubs = routerHubs
     }
     confirmRoutes(app:Express){
-        this.routers.forEach((router:Router) => {
-            router.setRoutes()
-            app.use(router.basePath, router.getRouter())
+        this.routerHubs.forEach((routerHub:RouterHub) => {
+            routerHub.getRouters().forEach((router:Router) => {
+                app.use(routerHub.basePath, router)
+            })
         })
     }
 }
