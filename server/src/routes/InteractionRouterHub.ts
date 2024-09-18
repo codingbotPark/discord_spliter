@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import { verifyKeyMiddleware } from "discord-interactions";
-import Router from "./Router";
+import RouterHub from './RouterHub';
 
-class InteractionRouter extends Router {
+class InteractionRouterHub extends RouterHub {
     constructor() {
         super('/interactions')
     }
@@ -13,4 +13,4 @@ class InteractionRouter extends Router {
     }
 }
 
-export default InteractionRouter
+export default InteractionRouterHub

@@ -4,7 +4,7 @@ import { HTTPMethod, isHTTPMethod } from "../util/isHttpMethod";
 class RouterBuilder{
     private subPath:string = ""
     private method:HTTPMethod | undefined;
-    private handlers:RequestHandler[] | [] = []
+    private handlers:RequestHandler[] = []
 
     setSubPath(subPath:string):this{
         this.subPath = subPath
@@ -17,7 +17,7 @@ class RouterBuilder{
     }
 
     addHandler(handler:RequestHandler):this{
-        this.handlers?.push()
+        this.handlers.push(handler)
         return this
     }
 
@@ -30,7 +30,7 @@ class RouterBuilder{
             return
         }
 
-        return Router()[this.method](this.subPath).use(this.handlers)
+        return Router({strict:true})[this.method](this.subPath).use(this.handlers)
     }
 
 }

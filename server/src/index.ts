@@ -1,6 +1,6 @@
 import App from "./App";
-import InteractionRouter from "./routers/InteractionRouter";
-import RouterManager from "./routers/RouterManager";
+import InteractionRouter from "./routes/InteractionRouterHub";
+import RouterManager from "./RouterManager";
 import ServerManager from "./ServerManager";
 
 

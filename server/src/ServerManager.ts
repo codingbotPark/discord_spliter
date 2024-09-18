@@ -1,5 +1,5 @@
 import { Server } from "http";
-import RouterManager from "./routers/RouterManager";
+import RouterManager from "./RouterManager";
 import { Express } from "express";
 
 // ServerManager class role = turn on & off express server
@@ -22,7 +22,7 @@ class ServerManager {
 
     openServer(app:Express){
         const port = this.getPort({presetPort:3000})
-        this.routerManager.registRoutes(app) // injection app
+        this.routerManager.confirmRoutes(app) // injection app to confirm routers
         this.server = app.listen(port, () => {
             // logging for opening server
         })
