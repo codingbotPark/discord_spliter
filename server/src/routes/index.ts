@@ -1,5 +1,5 @@
-import Route from "./RouterHub"
+import RouterHub from "./RouterHub"
 
-const routes:Route[] = []
+const routerHubs:RouterHub[] = []
 
-export default routes
+export default routerHubs

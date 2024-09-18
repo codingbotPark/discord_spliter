@@ -1,10 +1,16 @@
 import { RequestHandler, Router } from "express";
-import { HTTPMethod, isHTTPMethod } from "../util/isHttpMethod";
+import { HTTPMethod, isHTTPMethod } from "../util/httpMethod";
 
 class RouterBuilder{
     private subPath:string = ""
     private method:HTTPMethod | undefined;
     private handlers:RequestHandler[] = []
+
+    clear(){
+        this.subPath = ""
+        this.method = undefined
+        this.handlers = []
+    }
 
     setSubPath(subPath:string):this{
         this.subPath = subPath
@@ -30,7 +36,9 @@ class RouterBuilder{
             return
         }
 
-        return Router({strict:true})[this.method](this.subPath).use(this.handlers)
+        const router = Router({strict:true})[this.method](this.subPath).use(this.handlers)
+        this.clear()
+        return router
     }
 
 }

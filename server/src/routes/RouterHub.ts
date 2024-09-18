@@ -6,8 +6,11 @@ import { Router } from "express";
 
 abstract class RouterHub{
     routers:Router[] = []
-
-    constructor(){}
+    basePath:string;
+    
+    constructor(basePath:string = ""){
+        this.basePath = basePath
+    }
 
     // set Routes using addRouter method
     abstract setRouters():void
@@ -17,6 +20,7 @@ abstract class RouterHub{
     }
     
     protected addRouter(router:Router){
+        
         this.routers.push(router)
     }
 

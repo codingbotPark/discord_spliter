@@ -1,15 +1,17 @@
 import 'dotenv/config';
 import { verifyKeyMiddleware } from "discord-interactions";
 import RouterHub from './RouterHub';
+import RouterBuilder from './RouterBuilder';
+import { HTTPMethod } from '../util/httpMethod';
 
 class InteractionRouterHub extends RouterHub {
     constructor() {
         super('/interactions')
     }
 
-    setRoutes(): void {
-        this.setRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
-        this.setRoute('post', '', verifyKeyMiddleware(process.env.PUBLIC_KEY))
+    setRouters(): void {
+        const routerBuilder = new RouterBuilder()
+        this.addRouter(routerBuilder.setMethod(HTTPMethod.POST).)
     }
 }
 
