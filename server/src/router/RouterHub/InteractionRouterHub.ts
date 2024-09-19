@@ -1,22 +1,49 @@
-import 'dotenv/config';
-import { verifyKeyMiddleware } from '../../../node_modules/discord-interactions/dist/index';
-import RouterHub from './RouterHub';
-import RouterBuilder from '../RouterBuilder';
-import { HTTPMethod } from '../../util/httpMethod';
+import { verifiedEnv } from '../../util/verifyEnv.ts';
+import { InteractionResponseType, InteractionType, verifyKeyMiddleware } from 'discord-interactions';
+import RouterHub from './RouterHub.ts';
+import RouterBuilder from '../RouterBuilder.ts';
+import { HTTPMethod } from '../../util/httpMethod.ts';
 
 class InteractionRouterHub extends RouterHub {
     constructor() {
         super('/interactions')
     }
 
-    setRouters(): void {
+    setRouters() {
         const routerBuilder = new RouterBuilder()
         this.addRouter(
             routerBuilder
             .setMethod(HTTPMethod.POST)
-            .addHandler(verifyKeyMiddleware(process.env.PUBLIC_KEY as string))
-            .addHandler(() => console.log("test")).build()
+            .addHandler(verifyKeyMiddleware(verifiedEnv.PUBLIC_KEY))
+            .addHandler(async function (req, res) {
+                const { type, id, data } = req.body;
+
+                /**
+                 * Handle verification requests
+                 */
+                if (type === InteractionType.PING) {
+                    return res.send({ type: InteractionResponseType.PONG });
+                }
+
+                if (type === InteractionType.APPLICATION_COMMAND){
+                    const { name } = data;
+
+                    // "test" command
+                    if (name === 'test') {
+                        // Send a message into the channel where command was triggered from
+                        return res.send({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                            // Fetches a random emoji to send from a helper function
+                            content: `hello world`,
+                        },
+                        });
+                    }
+                }
+            }).build()
         )
+
+        return this
     }
 }
 

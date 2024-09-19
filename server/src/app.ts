@@ -14,6 +14,7 @@ class App {
     }
 
     start(){
+        console.log("server on")
         this.serverManager.openServer(this.app)
     }
 

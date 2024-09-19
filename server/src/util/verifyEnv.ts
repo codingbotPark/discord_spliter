@@ -10,10 +10,7 @@ const zodObject = {
 }
 type ZodSchemaType = ZodObject<typeof zodObject>;
 
-
-export const envSchema = z.object(zodObject);
-
-export function verifyEnv(envSchema:ZodSchemaType){
+function verifyEnv(envSchema:ZodSchemaType){
 
     const envServer = envSchema.safeParse({
         PORT:process.env.PORT,
@@ -23,7 +20,7 @@ export function verifyEnv(envSchema:ZodSchemaType){
     })
     if (envServer.error){
         // logging env setting error
-        return
+        throw new Error(`Environment validation error: ${envServer.error}`);
     }
     
     // data = schema for env
@@ -31,6 +28,8 @@ export function verifyEnv(envSchema:ZodSchemaType){
     return envServerSchema
 }
 
+export const envSchema = z.object(zodObject);
+export const verifiedEnv = verifyEnv(envSchema)
 
 
 

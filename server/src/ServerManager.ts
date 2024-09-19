@@ -25,6 +25,7 @@ class ServerManager {
         this.routerManager.confirmRoutes(app) // injection app to confirm routers
         this.server = app.listen(port, () => {
             // logging for opening server
+            console.log("listening port " + port)
         })
 
     }

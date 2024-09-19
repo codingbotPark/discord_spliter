@@ -1,5 +1,5 @@
-import { RequestHandler, Router, Handler } from "express";
-import { HTTPMethod, isHTTPMethod } from "../util/httpMethod";
+import { RequestHandler, Router } from "express";
+import { HTTPMethod, isHTTPMethod } from "../util/httpMethod.ts";
 
 // RouterBuilder class role = builder for setting up router to RouterHub
 class RouterBuilder{

@@ -12,8 +12,17 @@ class RouterManager{
 
     confirmRoutes(app:Express){
         this.routerHubs.forEach((routerHub:RouterHub) => {
-            routerHub.getRouters().forEach((router:Router) => {
-                app.use(routerHub.basePath, router)
+            routerHub.setRouters().getRouters().forEach((router:Router) => {
+
+                // Iterate through each route in the router
+                router.stack.forEach((layer: any) => {
+                    if (layer.route) { // If this is a route and not middleware
+                        const methods = Object.keys(layer.route.methods).join(', ').toUpperCase(); // HTTP methods
+                        console.log(`Method: [${methods}], Path: ${routerHub.getBasePath() + layer.route.path}`);
+                    }
+                });
+
+                app.use(routerHub.getBasePath(), router)
             })
         })
     }

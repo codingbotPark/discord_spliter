@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import fs from 'fs';
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 // Logger class role = write log
 /** @TODO decide logger to make builder(logging manager & logger builder) or middleware(handler requests and throws) */
