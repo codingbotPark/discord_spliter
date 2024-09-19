@@ -1,5 +1,5 @@
 import { Server } from "http";
-import RouterManager from "./RouterManager";
+import RouterManager from "./RouterManager.ts";
 import { Express } from "express";
 
 // ServerManager class role = turn on & off express server

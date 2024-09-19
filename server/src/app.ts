@@ -1,6 +1,7 @@
 import express, {Express} from 'express'
 import 'dotenv/config';
-import ServerManager from './ServerManager';
+import ServerManager from './ServerManager.ts';
+
 
 // App class role = start & stop app
 class App {

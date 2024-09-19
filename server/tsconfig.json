@@ -1,18 +1,24 @@
 {
     "compilerOptions": {
         "target": "ESNext",                   
-        "module": "commonjs",                 
+        "module": "ESNext",                 
         "strict": true,                       // strict type checking
         "esModuleInterop": true,              // compatible with ES module
+        "moduleResolution": "Node",         // to 
         "forceConsistentCasingInFileNames": true, // keep letter case
         // "skipLibCheck": true,                 // type checking
         "outDir": "./dist",                   // dist path
         "rootDir": "./src",                   // source path
-        "resolveJsonModule": true             // import json
+        // "resolveJsonModule": true,             // import json
+        "allowImportingTsExtensions":true,      // to use ESM
+        "noEmit":true,
+    },
+    "ts-node": {
+        "esm":true, // use ESM
     },
     "include": [
         "src/**/*",
-        "process-env.d.ts"
+        "environment.d.ts"
     ],
     "exclude": [
         "node_modules",

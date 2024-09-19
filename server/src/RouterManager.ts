@@ -1,13 +1,12 @@
-import RouterHub from "./router/RouterHub/RouterHub";
-import RouterHubs from "./router/RouterHub/RouterHub";
+import RouterHub from "./router/RouterHub/RouterHub.ts";
 import { Express, Router } from "express";
 
 // RouterManager class role = set Routers to app
 class RouterManager{
 
-    routerHubs:RouterHubs[]
+    routerHubs:RouterHub[]
     
-    constructor(routerHubs:RouterHubs[]){
+    constructor(routerHubs:RouterHub[]){
         this.routerHubs = routerHubs
     }
 

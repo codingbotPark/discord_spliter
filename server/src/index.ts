@@ -1,8 +1,7 @@
-import App from "./App";
-import routerHubs from "./router";
-import RouterManager from "./RouterManager";
-import ServerManager from "./ServerManager";
-
+import App from "./App.ts";
+import routerHubs from "./router/index.ts";
+import RouterManager from "./RouterManager.ts";
+import ServerManager from "./ServerManager.ts";
 
 const routerManager = new RouterManager(routerHubs)
 const serverManager = new ServerManager(routerManager)

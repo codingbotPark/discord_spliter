@@ -1,5 +1,5 @@
-import InteractionRouterHub from "./RouterHub/InteractionRouterHub"
-import RouterHub from "./RouterHub/RouterHub"
+import InteractionRouterHub from "./RouterHub/InteractionRouterHub.ts"
+import RouterHub from "./RouterHub/RouterHub.ts"
 
 const routerHubs:RouterHub[] = [
     new InteractionRouterHub(),
