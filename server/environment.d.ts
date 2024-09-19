@@ -1,11 +1,13 @@
+
+
+import { z } from "zod";
+import { envSchema } from "./src/util/verifyEnv";
+
+type EnvSchemaType = z.infer<typeof envSchema>;
+
 declare global {
     namespace NodeJS {
-        interface ProcessEnv {
-            PORT: string | undefined;
-            APP_ID: string;
-            DISCORD_TOKEN: string;
-            PUBLIC_KEY: string;
-        }
+        interface ProcessEnv extends EnvSchemaType {}
     }
 }
 
