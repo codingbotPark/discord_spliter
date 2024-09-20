@@ -11,8 +11,8 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
-    "start:prod": "node dist/index.ts",
-    "register": "node src/commands/register.ts",
+    "start:prod": "node dist/index.js",
+    "register": "ts-node src/config/installCommands.ts",
     "dev": "nodemon"
   },
   "author": "Shay DeWael",
