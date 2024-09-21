@@ -1,8 +1,8 @@
 {
-  "name": "discord-getting-started",
+  "name": "discord-spliter",
   "private": true,
   "version": "1.0.0",
-  "description": "Discord example app",
+  "description": "discord spliter",
   "main": "index.js",
   "type": "module",
   "engines": {
@@ -12,11 +12,11 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "start:prod": "node dist/index.js",
-    "register": "ts-node src/config/installCommands.ts",
+    "register": "ts-node src/config/index.ts",
     "dev": "nodemon"
   },
-  "author": "Shay DeWael",
-  "license": "MIT",
+  "author": "codingbotPark",
+  "license": "Apache-2.0",
   "dependencies": {
     "discord-interactions": "^4.0.0",
     "dotenv": "^16.0.3",
