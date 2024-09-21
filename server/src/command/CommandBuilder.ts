@@ -35,7 +35,7 @@ class CommandBuilder{
             return
             // need execution
         }
-        return new Command(this.name, this.description, this.execution)
+        return new Command({name:this.name, description:this.description, execution:this.execution})
     }
 }
 
