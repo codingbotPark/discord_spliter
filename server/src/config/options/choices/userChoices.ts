@@ -1,10 +1,6 @@
 
 
-const userChoices:any = [
-    {
-        name:"test",
-        value:"test"
-    }
-] // 유저 리스트
+// 유저 리스트
+const userChoices:any = []
 
 export default userChoices
