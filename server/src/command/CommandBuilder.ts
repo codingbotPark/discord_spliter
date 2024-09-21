@@ -1,41 +1,29 @@
-import Command from "./Command";
+import Command from "./class/Command.ts";
 
 // CommandBuilder class role = build command
 class CommandBuilder{
+    private data: Partial<Command> = {};
 
-    private name:string | undefined
-    private description:string | undefined
-    private execution:Function | undefined
-
-    clear(){
-        this.name = undefined
-        this.description = undefined
-        this.execution = undefined
-    }    
-
-    setName(name:string){
-        this.name = name
+    set<K extends keyof Command>(key: K, value: Command[K]): this {
+        this.data[key] = value;
+        return this;
     }
 
-    setDescription(description:string){
-        this.description = description
-    }
-
-    setExecution(execution:Function){
-        this.execution = execution
+    private isCommand(data: Partial<Command>): data is Command {
+        return (
+            typeof data.name === "string" &&
+            typeof data.description === "string" &&
+            typeof data.execution === "function"
+        );
     }
 
     // return Command, after handling exception
-    build(){
-        if (!this.name){
-            return
-            // need name
+    build():Command{
+        if (!this.isCommand(this.data)) {
+            throw Error()
+            // missing require property 
         }
-        if (!this.execution){
-            return
-            // need execution
-        }
-        return new Command({name:this.name, description:this.description, execution:this.execution})
+        return new Command(this.data)
     }
 }
 

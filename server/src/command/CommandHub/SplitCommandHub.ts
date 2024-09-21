@@ -1,22 +1,55 @@
-import Command from "../Command";
-import CommandBuilder from "../CommandBuilder";
+import Command from "../class/Command.ts";
+import CommandOption from "../class/CommandOption.ts";
+import CommandBuilder from "../CommandBuilder.ts";
+import CommandOptionBuilder from "../CommandOptionBuilder.ts";
 
 
-class splitCommandHub{
+class splitCommandHub {
     commandBuilder = new CommandBuilder()
-    private commands:Command[] = []
+    commandOptionBuilder = new CommandOptionBuilder()
+    private commands: Command[] = []
 
-    constructor(){}
+    constructor() { }
 
-    setCommands(){
-        this.commandBuilder.setName("test").
+    setCommands() {
+        this.addCommand(
+            this.commandBuilder.set("name", 'game')
+                .set("description", "split reference game")
+                .set("type", 3)
+                .set("execution", () => {
+                    console.log("test1")
+                })
+                .set("options", [
+                    new CommandOption({
+                        name: "overwatch",
+                        description: "overwatch API",
+                        type: 3,
+                    }),
+                    new CommandOption({
+                        name:"league of legends",
+                        description: "league of legneds API",
+                        type:3
+                    })
+                ])
+                .build()
+        )
+        this.addCommand(
+            new Command({
+                type: 3,
+                name: 'random',
+                description: 'split random',
+                execution() {
+                    console.log("test2")
+                }
+            })
+        )
     }
 
-    getCommands(){
+    getCommands() {
 
     }
 
-    addCommand(command:Command){
+    addCommand(command: Command) {
         this.commands.push(command)
     }
 }

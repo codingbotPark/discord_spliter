@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Employee } from "../util/Logger.ts";
 import { Manager } from "./Manager.ts";
-import Command from "../command/Command.ts";
+import Command from "../command/class/Command.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 
