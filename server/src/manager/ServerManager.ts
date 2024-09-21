@@ -1,33 +1,31 @@
 import { Server } from "http";
 import RouterManager from "./RouterManager.ts";
 import { Express } from "express";
+import { Manager } from "./Manager.ts";
+import { verifiedEnv } from "../util/verifyEnv.ts";
+import { Employee } from "../util/Logger.ts";
 
 // ServerManager class role = turn on & off express server
-class ServerManager {
+class ServerManager extends Employee implements Manager {
 
-    routerManager:RouterManager;
     server:Server | undefined;
     
-    constructor(routerManager:RouterManager){
-        this.routerManager = routerManager
+    constructor(){super()}
+
+    manage(app: Express): void {
+        this.openServer(app)
     }
 
-    private getPort({presetPort}:{presetPort:number}):number{
-        const envPort = Number(process.env.PORT)
-        if (isNaN(envPort)){
-            return presetPort
-        }
-        return envPort
+    fired(): void {
+        this.closeServer()
     }
 
     openServer(app:Express){
-        const port = this.getPort({presetPort:3000})
-        this.routerManager.confirmRoutes(app) // injection app to confirm routers
+        const port = verifiedEnv.PORT
         this.server = app.listen(port, () => {
             // logging for opening server
             console.log("listening port " + port)
         })
-
     }
 
     closeServer(){
@@ -35,6 +33,7 @@ class ServerManager {
             // logging for closeing server
         })
     }
+
 }
 
 export default ServerManager

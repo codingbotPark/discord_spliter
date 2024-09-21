@@ -31,5 +31,13 @@ class Logger{
     };
 
 }
-
 export default Logger
+
+
+export abstract class Employee{
+    constructor(){
+        // logging created
+    }
+    fired(){console.log(this.constructor.name + " fired")}
+}
+

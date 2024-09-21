@@ -1,25 +1,25 @@
 import express, {Express} from 'express'
 import 'dotenv/config';
-import ServerManager from './ServerManager.ts';
+import { EmployedManagerType, Manager } from './manager/Manager.ts';
 
 
 // App class role = start & stop app
 class App {
     private app:Express
-    private serverManager:ServerManager
+    private managers:EmployedManagerType[]
 
-    constructor(serverManager:ServerManager){
-        this.serverManager = serverManager
+    constructor(managers:EmployedManagerType[]){
         this.app = express()
+        this.managers = managers
     }
 
     start(){
         console.log("server on")
-        this.serverManager.openServer(this.app)
+        this.managers.forEach((manager) => manager.manage(this.app))
     }
 
     stop(){
-        this.serverManager.closeServer()
+        this.managers.forEach((manager) => manager.fired())
     }
 
 }

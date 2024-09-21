@@ -1,9 +1,11 @@
 import {z, ZodObject} from 'zod'
 import 'dotenv/config'
 
+const defautlPort = 3000
+
 /** @TODO narrowing valid range(ex length)*/
 const zodObject = {
-    PORT: z.number().optional().default(3000),
+    PORT: z.number().optional().default(defautlPort),
     APP_ID: z.string(),
     DISCORD_TOKEN: z.string(),
     PUBLIC_KEY: z.string(),
