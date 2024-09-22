@@ -1,17 +1,16 @@
-import { Express } from "express";
 import { Employee } from "../util/Logger.ts";
 import { Manager } from "./Manager.ts";
-import Command from "../command/class/Command.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
+import CommandHub from "../command/CommandHub/CommandHub.ts";
 
 // install command to discord guild
 class CommandManager extends Employee implements Manager {
-    private commands: Command[]
+    private commandHubs: CommandHub[]
 
-    constructor(commands: Command[]) {
+    constructor(commandHubs: CommandHub[]) {
         super()
-        this.commands = commands
+        this.commandHubs = commandHubs
     }
 
     manage(): void {
@@ -23,7 +22,7 @@ class CommandManager extends Employee implements Manager {
         const endpoint = `applications/${verifiedEnv.APP_ID}/commands`;
 
         try {
-            await DiscordRequest(endpoint, { method: 'PUT', body: JSON.stringify(this.commands) });
+            await DiscordRequest(endpoint, { method: 'PUT', body: JSON.stringify(this.commandHubs) });
         } catch (err) {
             console.error(err);
         }

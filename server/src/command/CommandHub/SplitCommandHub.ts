@@ -2,14 +2,15 @@ import Command from "../class/Command.ts";
 import CommandOption from "../class/CommandOption.ts";
 import CommandBuilder from "../CommandBuilder.ts";
 import CommandOptionBuilder from "../CommandOptionBuilder.ts";
+import CommandHub from "./CommandHub.ts";
 
 
-class splitCommandHub {
-    commandBuilder = new CommandBuilder()
+class splitCommandHub extends CommandHub {
     commandOptionBuilder = new CommandOptionBuilder()
-    private commands: Command[] = []
 
-    constructor() { }
+    constructor() {
+        super(new CommandBuilder)
+    }
 
     setCommands() {
         this.addCommand(
@@ -43,10 +44,6 @@ class splitCommandHub {
                 }
             })
         )
-    }
-
-    getCommands() {
-
     }
 
     addCommand(command: Command) {
