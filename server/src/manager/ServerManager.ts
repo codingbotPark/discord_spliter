@@ -1,12 +1,10 @@
 import { Server } from "http";
-import RouterManager from "./RouterManager.ts";
 import { Express } from "express";
-import { Manager } from "./Manager.ts";
+import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
-import { Employee } from "../util/Logger.ts";
 
 // ServerManager class role = turn on & off express server
-class ServerManager extends Employee implements Manager {
+class ServerManager extends Manager {
 
     server:Server | undefined;
     

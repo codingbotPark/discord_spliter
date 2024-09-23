@@ -1,10 +1,9 @@
 import RouterHub from "../router/RouterHub/RouterHub.ts"; 
 import { Express, Router } from "express";
-import { Manager } from "./Manager.ts";
-import { Employee } from "../util/Logger.ts";
+import Manager from "../employee/Manager.ts";
 
 // RouterManager class role = set Routers to app
-class RouterManager extends Employee implements Manager{
+class RouterManager extends Manager{
 
     private routerHubs:RouterHub[]
     

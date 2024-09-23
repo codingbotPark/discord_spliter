@@ -1,11 +1,11 @@
 import { Employee } from "../util/Logger.ts";
-import { Manager } from "./Manager.ts";
+import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import CommandHub from "../command/CommandHub/CommandHub.ts";
 
 // install command to discord guild
-class CommandManager extends Employee implements Manager {
+class CommandManager extends Manager {
     private commandHubs: CommandHub[]
 
     constructor(commandHubs: CommandHub[]) {

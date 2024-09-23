@@ -1,3 +1,4 @@
+import commandHubs from "../command";
 import routerHubs from "../router";
 import CommandManager from "./CommandManager";
 import { EmployedManagerType } from "./Manager";
