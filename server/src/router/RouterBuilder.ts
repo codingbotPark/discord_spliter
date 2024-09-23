@@ -1,49 +1,37 @@
-import { RequestHandler, Router } from "express";
+
+import express, {RequestHandler, Router} from "express";
+import Builder from "../employee/Builder.ts";
 import { HTTPMethod, isHTTPMethod } from "../util/httpMethod.ts";
 
-// RouterBuilder class role = builder for setting up router to RouterHub
-class RouterBuilder{
-    private subPath:string = ""
-    private method:HTTPMethod | undefined;
-    private handlers:RequestHandler[] = []
+interface RouterTemplate{ method: HTTPMethod; subPath:string; handlers:Array<RequestHandler> }
 
-    clear(){
-        this.subPath = ""
-        this.method = undefined
-        this.handlers = []
+class RouterBuilder extends Builder<RouterTemplate, Router>{
+
+    constructor(){
+        super()
+        this.building.handlers = [] // handlers 초기화
     }
 
-    setSubPath(subPath:string):this{
-        this.subPath = subPath
-        return this
+    private isRouter(data:Partial<RouterTemplate>):data is RouterTemplate{
+        return (
+            (!!data.handlers?.length) &&
+            isHTTPMethod(data.method) && 
+            typeof this.building.subPath === 'string'
+        );
     }
 
-    setMethod(method:HTTPMethod):this{
-        this.method = method
-        return this
+    build(): Router {
+        if(!this.isRouter(this.building)){
+             /** @TODO add err handler */
+            throw Error()
+        }
+        return Router()[this.building.method](this.building.subPath).use(this.building.handlers)
     }
 
     addHandler(handler:RequestHandler):this{
-        this.handlers.push(handler)
+        this.building.handlers?.push(handler)
         return this
     }
-
-    build():Router{
-        if(!this.handlers.length){
-            // need at least 1 length
-            return Router()
-        }
-        if(!isHTTPMethod(this.method)){
-            // have to define method
-            return Router()
-        }
-
-        const router = Router({strict:true})[this.method](this.subPath).use(this.handlers)
-        this.clear()
-        return router
-    }
-
-    /** @TODO add err handler */
 
 }
 
