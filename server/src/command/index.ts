@@ -1,8 +1,12 @@
-import CommandHub from "./CommandHub/CommandHub.ts";
-import splitCommandHub from "./CommandHub/SplitCommandHub";
+import Collector from "../employee/Collector.ts";
+import Command from "./class/Command.ts";
+import CommandBuilder from "./CommandBuilder.ts";
+import SplitCommandCollector from "./SplitCommandCollector";
 
-const commandHubs:CommandHub[] = [
-    new splitCommandHub(),
+export type CommandCollector = Collector<Command, CommandBuilder>
+
+const commandCollectors:CommandCollector[] = [
+    new SplitCommandCollector(new CommandBuilder()),
 ]
 
-export default commandHubs
+export default commandCollectors

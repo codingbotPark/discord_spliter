@@ -1,16 +1,18 @@
-import { Employee } from "../util/Logger.ts";
 import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
-import CommandHub from "../command/CommandHub/CommandHub.ts";
+import { CommandCollector } from "../command/index.ts";
+import Collector from "../employee/Collector.ts";
+
+
 
 // install command to discord guild
 class CommandManager extends Manager {
-    private commandHubs: CommandHub[]
+    private commandCollectors: CommandCollector[]
 
-    constructor(commandHubs: CommandHub[]) {
+    constructor(commandCollectors: CommandCollector[]) {
         super()
-        this.commandHubs = commandHubs
+        this.commandCollectors = commandCollectors
     }
 
     manage(): void {
@@ -22,7 +24,7 @@ class CommandManager extends Manager {
         const endpoint = `applications/${verifiedEnv.APP_ID}/commands`;
 
         try {
-            await DiscordRequest(endpoint, { method: 'PUT', body: JSON.stringify(this.commandHubs) });
+            await DiscordRequest(endpoint, { method: 'PUT', body: JSON.stringify(this.commandCollectors) });
         } catch (err) {
             console.error(err);
         }

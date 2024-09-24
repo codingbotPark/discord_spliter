@@ -10,7 +10,8 @@ abstract class Collector<Category, Equipment> extends Employee{
         this.equipment = equipment
     }
 
-    abstract collect():void
+    /** @THINK return this or set void */
+    abstract collect():this
 
     getCollection():Category[]{
         return this.collection
