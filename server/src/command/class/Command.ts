@@ -3,7 +3,7 @@ import CommandOption, { ApplicationCommandOption } from "./CommandOption.ts";
 // command class role = have execution with name
 class Command implements ChatInputApplicationCommandData {
     name:string
-    description:string
+    description:string | undefined
     execution: Function
     options:CommandOption[] | undefined;
     defaultPermission: boolean | undefined
@@ -22,7 +22,7 @@ class Command implements ChatInputApplicationCommandData {
 // interface for command (similar with discordjs ChatInputApplicationCommandData)
 export interface ChatInputApplicationCommandData {
     name: string;
-    description: string;
+    description?: string;
     options?: ApplicationCommandOption[];
     defaultPermission?: boolean;
     type?: number;

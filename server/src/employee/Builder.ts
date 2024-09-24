@@ -1,4 +1,4 @@
-import Employee from "./Employee";
+import Employee from "./Employee.ts";
 
 
 abstract class Builder<Building, ReturnType = Building> extends Employee{

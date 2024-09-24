@@ -1,15 +1,15 @@
-import commandHubs from "../command";
-import routerHubs from "../router";
-import CommandManager from "./CommandManager";
-import { EmployedManagerType } from "./Manager";
-import RouterManager from "./RouterManager";
-import ServerManager from "./ServerManager";
+import commandCollectors from "../command/index.ts";
+import routerCollections from "../router/index.ts";
+import Manager from "../employee/Manager.ts";
+import CommandManager from "./CommandManager.ts";
+import RouterManager from "./RouterManager.ts";
+import ServerManager from "./ServerManager.ts";
 
 
-const managers:EmployedManagerType[] = [
+const managers:Manager[] = [
     new ServerManager(),
-    new RouterManager(routerHubs),
-    new CommandManager(commandHubs)
+    new RouterManager(routerCollections),
+    new CommandManager(commandCollectors)
 ]
 
 export default managers

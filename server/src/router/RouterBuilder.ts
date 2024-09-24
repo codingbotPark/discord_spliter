@@ -12,6 +12,7 @@ class RouterBuilder extends Builder<RouterTemplate, Router>{
     constructor(basePath:string = ""){
         super()
         this.building.handlers = [] // handlers 초기화
+        this.building.subPath = "" // subPath 초기화
         this.basePath = basePath
     }
 
@@ -19,17 +20,24 @@ class RouterBuilder extends Builder<RouterTemplate, Router>{
         return (
             (!!data.handlers?.length) &&
             isHTTPMethod(data.method) && 
-            typeof this.building.subPath === 'string'
+            typeof data.subPath === 'string'
         );
     }
 
     build(): Router {
+        console.log(this.building)
         if(!this.isRouter(this.building)){
              /** @TODO add err handler */
             throw Error()
         }
         const path = normalizePath(this.basePath, this.building.subPath)
-        return Router()[this.building.method](path).use(this.building.handlers)
+        // return Router()[this.building.method](path, ...this.building.handlers)
+        // return Router()[this.building.method](path).use(this.building.handlers)
+        // 라우트를 정의하고 핸들러를 추가
+        const route = Router()[this.building.method](path);
+        route.use(...this.building.handlers);
+
+        return route
     }
 
     addHandler(handler:RequestHandler):this{

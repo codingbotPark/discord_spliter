@@ -1,5 +1,5 @@
 import { Express } from "express";
-import Employee from "./Employee";
+import Employee from "./Employee.ts";
 
 // Manager interface role = manager's 
 export default abstract class Manager extends Employee{

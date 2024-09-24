@@ -11,23 +11,22 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
         this.addItemToCollection(
             this.equipment
             .set("name", "game")
-            .set("description", "split reference game")
             .set("type", 3)
             .set("execution", () => {
                 console.log("test1")
             })
-            .set("options",[
-                new CommandOption({
-                    name: "overwatch",
-                    description: "overwatch API",
-                    type: 3,
-                }),
-                new CommandOption({
-                    name:"league of legends",
-                    description: "league of legneds API",
-                    type:3
-                })
-            ])
+            // .set("options",[
+            //     new CommandOption({
+            //         name: "overwatch",
+            //         description: "overwatch API",
+            //         type: 3,
+            //     }),
+            //     new CommandOption({
+            //         name:"league-of-legends",
+            //         description: "league of legneds API",
+            //         type:3
+            //     })
+            // ])
             .build()
         )
 
@@ -35,7 +34,6 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
             new Command({
                 type: 3,
                 name: 'random',
-                description: 'split random',
                 execution() {
                     console.log("test2")
                 }

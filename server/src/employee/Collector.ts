@@ -1,4 +1,4 @@
-import Employee from "./Employee"
+import Employee from "./Employee.ts"
 
 
 abstract class Collector<Category, Equipment> extends Employee{

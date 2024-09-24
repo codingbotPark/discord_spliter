@@ -20,13 +20,9 @@ class RouterManager extends Manager{
         this.routerCollectors.forEach((routerCollector:RouterCollector) => {
             routerCollector.collect().getCollection().forEach((router:Router) => {
 
-                // Iterate through each route in the router
-                router.stack.forEach((layer: any) => {
-                    if (layer.route) { // If this is a route and not middleware
-                        const methods = Object.keys(layer.route.methods).join(', ').toUpperCase(); // HTTP methods
-                        console.log(`Method: [${methods}], Path: ${layer.route.path}`);
-                    }
-                });
+                router.stack.forEach((item) => {
+                    console.log(item.method,item.path, item.handle)
+                })
 
                 app.use(router)
             })

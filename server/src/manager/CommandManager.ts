@@ -3,6 +3,8 @@ import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import { CommandCollector } from "../command/index.ts";
 import Collector from "../employee/Collector.ts";
+import Command from "../command/class/Command.ts";
+import { HTTPMethod } from "../util/httpMethod.ts";
 
 
 
@@ -16,15 +18,19 @@ class CommandManager extends Manager {
     }
 
     manage(): void {
-        this.installAllCommand()
+        const commands = this.commandCollectors.map((commandCollector) => commandCollector.collect().getCollection()).flat()
+        console.log(commands)
+        console.log(JSON.stringify(commands))
+        this.installAllCommand(commands)
     }
 
-    async installAllCommand() {
+    async installAllCommand(commands:Array<Command>) {
         // API endpoint to overwrite global commands
         const endpoint = `applications/${verifiedEnv.APP_ID}/commands`;
 
         try {
-            await DiscordRequest(endpoint, { method: 'PUT', body: JSON.stringify(this.commandCollectors) });
+            await DiscordRequest(endpoint, { method: HTTPMethod.PUT, body: commands });
+            console.log("install commands successfully")
         } catch (err) {
             console.error(err);
         }
@@ -32,3 +38,5 @@ class CommandManager extends Manager {
 }
 
 export default CommandManager
+
+

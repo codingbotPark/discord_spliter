@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
-import Collector from "../employee/Collector";
-import RouterBuilder from "./RouterBuilder";
-import { HTTPMethod } from "../util/httpMethod";
+import Collector from "../employee/Collector.ts";
+import RouterBuilder from "./RouterBuilder.ts";
+import { HTTPMethod } from "../util/httpMethod.ts";
 
 
 class InteractionRouterCollector extends Collector<Router, RouterBuilder>{

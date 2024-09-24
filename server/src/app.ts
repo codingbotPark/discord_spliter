@@ -1,14 +1,14 @@
 import express, {Express} from 'express'
 import 'dotenv/config';
-import { EmployedManagerType, Manager } from './manager/Manager.ts';
+import Manager from './employee/Manager';
 
 
 // App class role = start & stop app
 class App {
     private app:Express
-    private managers:EmployedManagerType[]
+    private managers:Manager[]
 
-    constructor(managers:EmployedManagerType[]){
+    constructor(managers:Manager[]){
         this.app = express()
         this.managers = managers
     }

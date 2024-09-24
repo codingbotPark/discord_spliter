@@ -1,6 +1,13 @@
+import { HTTPMethod, HTTPMethodType } from "./httpMethod.ts";
 import { verifiedEnv } from "./verifyEnv.ts";
 
-export default async function DiscordRequest(endpoint:string, options:RequestInit) {
+interface discordRequestOptions{
+  method:HTTPMethodType | HTTPMethod
+  body?: any; // 본문, JSON 형식
+  headers?: HeadersInit; // 추가 헤더
+}
+
+export default async function DiscordRequest(endpoint:string, options:discordRequestOptions) {
     // append endpoint to root API URL
     const url = 'https://discord.com/api/v10/' + endpoint;
 

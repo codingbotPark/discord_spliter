@@ -5,8 +5,8 @@ import RouterBuilder from "./RouterBuilder.ts"
 
 export type RouterCollector = Collector<Router, RouterBuilder>
 
-const routerHubs:RouterCollector[] = [
+const routerCollections:RouterCollector[] = [
     new InteractionRouterCollector(new RouterBuilder("interactions")),
 ]
 
-export default routerHubs
+export default routerCollections
