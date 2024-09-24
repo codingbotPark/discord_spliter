@@ -9,7 +9,8 @@ import ServerManager from "./ServerManager.ts";
 const managers:Manager[] = [
     new ServerManager(),
     new RouterManager(routerCollections),
-    new CommandManager(commandCollectors)
+    // // split installation manager because regist command limitation
+    // new CommandManager(commandCollectors) 
 ]
 
 export default managers

@@ -6,7 +6,7 @@ class CommandOptionBuilder extends Builder<CommandOption>{
 
     private isCommandOption(data: Partial<CommandOption>): data is CommandOption {
         return (
-            typeof data.lable === "string" &&
+            typeof data.name === "string" &&
             typeof data.description === "string" &&
             typeof data.type === "number"
         );

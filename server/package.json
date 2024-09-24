@@ -12,7 +12,7 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "start:prod": "node dist/index.js",
-    "register": "ts-node src/config/index.ts",
+    "register": "ts-node src/manager/CommandManager.ts",
     "dev": "nodemon"
   },
   "author": "codingbotPark",

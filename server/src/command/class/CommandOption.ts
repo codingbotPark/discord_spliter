@@ -7,14 +7,19 @@ class CommandOption implements ApplicationCommandOption{
     required?: boolean;
     choices?: Array<{ name: string; value: string | number }>;
     options?: CommandOption[];
+    min_value?:number;
+    max_value?:number;
 
-    constructor({type, name, description, required, choices, options}:ApplicationCommandOption){
-        this.type = type
-        this.name = name
-        this.description = description
-        this.required = required
-        this.choices = choices
-        this.options = options
+    constructor(options:ApplicationCommandOption){
+        this.type = options.type
+        this.name = options.name
+        this.description = options.description
+        this.required = options.required
+        this.choices = options.choices
+        this.options = options.options
+        this.min_value = options.min_value
+        this.max_value = options.max_value
+
     }
 }
 
@@ -26,6 +31,8 @@ export interface ApplicationCommandOption {
     required?: boolean;
     choices?: Array<{ name: string; value: string | number }>;
     options?: ApplicationCommandOption[];
+    min_value?:number;
+    max_value?:number;
 }
 
 export default CommandOption

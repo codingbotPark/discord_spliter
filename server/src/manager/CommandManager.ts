@@ -1,7 +1,7 @@
 import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
-import { CommandCollector } from "../command/index.ts";
+import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Collector from "../employee/Collector.ts";
 import Command from "../command/class/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
@@ -38,5 +38,8 @@ class CommandManager extends Manager {
 }
 
 export default CommandManager
+
+const commandManager = new CommandManager(commandCollectors)
+commandManager.manage()
 
 

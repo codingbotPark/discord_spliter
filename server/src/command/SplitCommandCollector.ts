@@ -10,30 +10,43 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
     collect():this {
         this.addItemToCollection(
             this.equipment
-            .set("name", "game")
-            .set("type", 3)
+            .set("name", "split")
+            .set("type", 1)
+            .set("description", "split void channel")
             .set("execution", () => {
                 console.log("test1")
             })
-            // .set("options",[
-            //     new CommandOption({
-            //         name: "overwatch",
-            //         description: "overwatch API",
-            //         type: 3,
-            //     }),
-            //     new CommandOption({
-            //         name:"league-of-legends",
-            //         description: "league of legneds API",
-            //         type:3
-            //     })
-            // ])
+            .set("options",[
+                new CommandOption({
+                    name: "game",
+                    description: "split with game",
+                    type: 3,
+                    choices:[
+                        {
+                            name:"Overwatch",
+                            value:"Overwatch API"
+                        },{
+                            name:"league of legends",
+                            value:"league of legends API"
+                        }
+                    ]
+                }),
+                new CommandOption({
+                    name:"random",
+                    description:"split random",
+                    min_value:2,
+                    max_value:10,
+                    type:4
+                })
+            ])
             .build()
         )
 
         this.addItemToCollection(
             new Command({
-                type: 3,
-                name: 'random',
+                type: 1,
+                description:"test2",
+                name: 'test2',
                 execution() {
                     console.log("test2")
                 }
