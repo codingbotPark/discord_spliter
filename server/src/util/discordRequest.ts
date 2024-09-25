@@ -17,7 +17,6 @@ export default async function DiscordRequest(endpoint:string, options:discordReq
     const headers:HeadersInit = {
         Authorization: `Bot ${verifiedEnv.DISCORD_TOKEN}`,
         'Content-Type': 'application/json; charset=UTF-8',
-        'User-Agent': 'DiscordBot (https://github.com/discord/discord-example-app, 1.0.0)',
       }
 
     // Use fetch to make requests
