@@ -1,4 +1,4 @@
-import { DiscordUser } from './discordUserObject.type.ts';  // User Object 타입을 미리 정의했다고 가정
+import { DiscordUser } from './discordUserObject.ts';  // User Object 타입을 미리 정의했다고 가정
 
 export type GuildMember = {
     user?: DiscordUser;  // User Object, 선택적 필드
@@ -13,3 +13,7 @@ export type GuildMember = {
     permissions?: string;  // 멤버의 권한, 선택적 필드 (OAuth2 관련)
     communication_disabled_until?: string | null;  // 타임아웃이 설정된 시간, 선택적 필드 (ISO8601 타임스탬프)
 };
+
+export function isHumanMember(discordUser: GuildMember): discordUser is GuildMember & { user: NonNullable<DiscordUser> } {
+    return !!(discordUser.user && !discordUser.user.bot);
+}

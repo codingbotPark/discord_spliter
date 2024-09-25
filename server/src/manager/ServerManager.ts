@@ -1,6 +1,6 @@
 import { Server } from "http";
 import { Express } from "express";
-import Manager from "../jobPosition/Manager.ts";
+import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 
 // ServerManager class role = turn on & off express server

@@ -1,5 +1,5 @@
 import Collector from "../employee/Collector.ts";
-import { GuildMember } from "../types/discordGuildMemberObject.type.ts";
+import { GuildMember, isHumanMember } from "../discord/discordGuildMemberObject.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
@@ -10,8 +10,10 @@ import CommandBuilder from "./CommandBuilder.ts";
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
 
-    /** @THINK about communicator for using API */
-    private async getGuildMemebers(){
+    private guildMemberChoices:ChoicesType = []
+
+    /** @THINK about communicator & archives for using API */
+    async initialize(){
         // to get guild member
         // 0. verify discord app
         // 1. intent guild member (application settings > BOT)
@@ -22,15 +24,17 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
         const guildMembers:GuildMember[] = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
         .then((res) => {return res.json()})
         .catch((err) => {throw Error(err)})
+
+        console.log(guildMembers)
         
-        // formatting to choices
-        const guildMemberChoices:ChoicesType = guildMembers.map((discordUser) => (discordUser.user && {
+        this.guildMemberChoices = guildMembers.filter((discordUser) => isHumanMember(discordUser)).map((discordUser) => ({
             name:discordUser.user.username,
             value:discordUser.user.id
-        })).filter((item) => item !== undefined)
+        }))
 
-        return guildMemberChoices
+        return this
     }
+
 
     collect():this {
         this.addItemToCollection(
@@ -82,7 +86,7 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     name:"exclude_user",
                     description:"exclude changing member",
                     type:3,
-                    // choices:
+                    choices:this.guildMemberChoices
                 })
             ])
             .build()
