@@ -1,9 +1,10 @@
 import Collector from "../employee/Collector.ts";
+import { GuildMember } from "../types/discordGuildMemberObject.type.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import Command from "./class/Command.ts";
-import CommandOption from "./class/CommandOption.ts";
+import CommandOption, { ChoicesType } from "./class/CommandOption.ts";
 import CommandBuilder from "./CommandBuilder.ts";
 
 
@@ -18,16 +19,20 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
         // ex https://discord.com/oauth2/authorize?client_id=<guildID>&scope=bot&permissions=16778256
         const endPoint = `/guilds/${verifiedEnv.GUILD_ID}/members?limit=1000`
 
-        const guildMembers = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
+        const guildMembers:GuildMember[] = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
         .then((res) => {return res.json()})
         .catch((err) => {throw Error(err)})
         
-        console.log(guildMembers)
-        
+        // formatting to choices
+        const guildMemberChoices:ChoicesType = guildMembers.map((discordUser) => (discordUser.user && {
+            name:discordUser.user.username,
+            value:discordUser.user.id
+        })).filter((item) => item !== undefined)
+
+        return guildMemberChoices
     }
 
     collect():this {
-        this.getGuildMemebers()
         this.addItemToCollection(
             this.equipment
             .set("name", "split")
@@ -76,14 +81,9 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                 new CommandOption({
                     name:"exclude_user",
                     description:"exclude changing member",
-                    type:3
-                    // choices:[
-                    //     {
-
-                    //     }
-                    // ]
+                    type:3,
+                    // choices:
                 })
-                
             ])
             .build()
         )

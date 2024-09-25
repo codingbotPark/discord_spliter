@@ -1,4 +1,4 @@
-import Collector from "../employee/Collector.ts";
+import Collector from "../jobPosition/Collector.ts";
 import Command from "./class/Command.ts";
 import CommandBuilder from "./CommandBuilder.ts";
 import SplitCommandCollector from "./SplitCommandCollector.ts";

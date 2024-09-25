@@ -1,6 +1,6 @@
 
 import express, {RequestHandler, Router} from "express";
-import Builder from "../employee/Builder.ts";
+import Builder from "../jobPosition/Builder.ts";
 import { HTTPMethod, isHTTPMethod } from "../util/httpMethod.ts";
 import normalizePath from "../util/normalizePath.ts";
 

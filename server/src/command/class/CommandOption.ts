@@ -29,10 +29,12 @@ export interface ApplicationCommandOption {
     name: string;
     description: string;
     required?: boolean;
-    choices?: Array<{ name: string; value: string | number }>;
+    choices?: ChoicesType;
     options?: ApplicationCommandOption[];
     min_value?:number;
     max_value?:number;
 }
+
+export type ChoicesType = Array<{ name: string; value: string | number }>;
 
 export default CommandOption
