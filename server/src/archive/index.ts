@@ -2,7 +2,7 @@ import Curator from "../employee/Curator.ts";
 import Archive from "./Archive.ts";
 import CommandCurator from "./CommandCurator.ts";
 
-const curators:Curator<Archive>[] = [
+const curators:Curator[] = [
     await new CommandCurator().setupArchive().executeArchivePlan()
 ]
 

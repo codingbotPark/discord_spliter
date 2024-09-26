@@ -10,10 +10,9 @@ import commandCollectors from "../command/index.ts";
 
 const managers:Manager[] = [
     new ArchiveManager(curators),
+    new CommandManager(commandCollectors),
     new ServerManager(),
     new RouterManager(routerCollections),
-    // // split installation manager because regist command limitation
-    new CommandManager(commandCollectors) 
 ]
 
 export default managers

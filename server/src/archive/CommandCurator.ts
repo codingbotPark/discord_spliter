@@ -16,13 +16,16 @@ class CommandCurator extends Curator{
 
     // for use in interactionRouterCollector
     static findExecutionFromCommand(name:string) {
-        const commands = CommandCurator.getFromArchive<Command[]>("commands")
+        const commands = CommandArchive.getInstance().getData<Command[]>("commands")
+
+
+        console.log("commands in findFunction", commands)
         if (!commands){throw Error("commands are not added")}
 
-        const execution = commands.find((command) => command.name === name)?.execution
+        const execution = commands?.find((command) => command.name === name)?.execution
         if (!execution){throw Error(`name : ${name} is not defined in commands`)}
 
-        return  execution
+        return execution
     }
 
     setupArchive():this{

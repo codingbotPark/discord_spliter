@@ -2,8 +2,9 @@ import Collector from "../employee/Collector.ts";
 import Command from "./Command/Command.ts";
 import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
-import { CommandArchive } from "../archive/CommandCurator.ts";
+import CommandCurator, { CommandArchive } from "../archive/CommandCurator.ts";
 import { Request, Response } from "express";
+import { splitCommandHandler } from "./handlers/splitCommandHandler.ts";
 
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
@@ -15,9 +16,7 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
             .set("name", "split")
             .set("type", 1)
             .set("description", "split void channel")
-            .set("execution", (req: Request, res: Response) => {
-                console.log("test")
-            })
+            .set("execution", splitCommandHandler)
             // name should not include space char
             .set("options",[
                 new CommandOption({
@@ -59,7 +58,7 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     name:"exclude_user",
                     description:"exclude changing member",
                     type:3,
-                    choices:CommandArchive.getInstance().getData("guildMemberChoices")
+                    choices:CommandCurator.getFromArchive("guildMemberChoices")
                 })
             ])
             .build()
