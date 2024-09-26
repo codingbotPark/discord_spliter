@@ -38,7 +38,5 @@ class CommandManager extends Manager {
 
 export default CommandManager
 
-const commandManager = new CommandManager(commandCollectors)
-commandManager.manage()
 
 

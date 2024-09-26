@@ -6,34 +6,10 @@ import { verifiedEnv } from "../util/verifyEnv.ts";
 import Command from "./Command/Command.ts";
 import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
+import { CommandArchive } from "../archive/CommandCurator.ts";
 
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
-
-    private guildMemberChoices:ChoicesType = []
-
-    /** @THINK about communicator & archives for using API */
-    async initialize(){
-        // to get guild member
-        // 0. verify discord app
-        // 1. intent guild member (application settings > BOT)
-        // 2. add bot to server(guild that you need) with role options
-        // ex https://discord.com/oauth2/authorize?client_id=<guildID>&scope=bot&permissions=16778256
-        const endPoint = `/guilds/${verifiedEnv.GUILD_ID}/members?limit=1000`
-
-        const guildMembers:GuildMember[] = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
-        .then((res) => {return res.json()})
-        .catch((err) => {throw Error(err)})
-
-        console.log(guildMembers)
-        
-        this.guildMemberChoices = guildMembers.filter((discordUser) => isHumanMember(discordUser)).map((discordUser) => ({
-            name:discordUser.user.username,
-            value:discordUser.user.id
-        }))
-
-        return this
-    }
 
 
     collect():this {
@@ -53,11 +29,11 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     type:3,
                     choices:[
                         {
-                            name:"game",
-                            value:"split with game"
-                        },{
                             name:"random",
                             value:"split with randomly"
+                        },{
+                            name:"game",
+                            value:"split with game"
                         },
                     ]
                 }),
@@ -86,7 +62,7 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     name:"exclude_user",
                     description:"exclude changing member",
                     type:3,
-                    choices:this.guildMemberChoices
+                    choices:CommandArchive.getInstance().getData("guildMemberChoices")
                 })
             ])
             .build()

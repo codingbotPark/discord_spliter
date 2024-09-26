@@ -9,7 +9,7 @@ export type CommandCollector = Collector<Command, CommandBuilder>
 
 /** @THINK  */
 const commandCollectors:CommandCollector[] = [
-    await new SplitCommandCollector(new CommandBuilder()).initialize(),
+    new SplitCommandCollector(new CommandBuilder()),
 ]
 
 export default commandCollectors
