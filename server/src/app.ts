@@ -1,6 +1,6 @@
 import express, {Express} from 'express'
 import 'dotenv/config';
-import Manager from './jobPosition/Manager';
+import Manager from './employee/Manager';
 
 
 // App class role = start & stop app

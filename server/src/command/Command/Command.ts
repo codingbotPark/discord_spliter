@@ -1,4 +1,4 @@
-import CommandOption, { ApplicationCommandOption } from "./CommandOption.ts";
+import CommandOption, { ApplicationCommandOption } from "../CommandOption/CommandOption.ts";
 
 // command class role = have execution with name
 class Command implements ChatInputApplicationCommandData {

@@ -1,4 +1,4 @@
-import { DiscordUser } from './discordUserObject.ts';  // User Object 타입을 미리 정의했다고 가정
+import { DiscordUser } from './discordUserObject.type.ts';  // User Object 타입을 미리 정의했다고 가정
 
 export type GuildMember = {
     user?: DiscordUser;  // User Object, 선택적 필드

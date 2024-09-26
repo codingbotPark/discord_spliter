@@ -2,7 +2,7 @@ import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import commandCollectors, { CommandCollector } from "../command/index.ts";
-import Command from "../command/class/Command.ts";
+import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 
 

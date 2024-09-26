@@ -1,5 +1,5 @@
-import Builder from "../employee/Builder.ts";
-import CommandOption from "./class/CommandOption.ts";
+import Builder from "../../employee/Builder.ts";
+import CommandOption from "./CommandOption.ts";
 
 // CommandBuilder class role = build command
 class CommandOptionBuilder extends Builder<CommandOption>{

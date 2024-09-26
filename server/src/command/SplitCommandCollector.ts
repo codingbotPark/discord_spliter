@@ -1,11 +1,11 @@
 import Collector from "../employee/Collector.ts";
-import { GuildMember, isHumanMember } from "../discord/discordGuildMemberObject.ts";
+import { GuildMember, isHumanMember } from "../types/discordGuildMemberObject.type.ts";
 import DiscordRequest from "../util/discordRequest.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
-import Command from "./class/Command.ts";
-import CommandOption, { ChoicesType } from "./class/CommandOption.ts";
-import CommandBuilder from "./CommandBuilder.ts";
+import Command from "./Command/Command.ts";
+import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
+import CommandBuilder from "./Command/CommandBuilder.ts";
 
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
