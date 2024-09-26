@@ -4,9 +4,9 @@ import Curator from "../employee/Curator.ts";
 import Archive from "../archive/Archive.ts";
 
 class ArchiveManager extends Manager{
-    curators:Curator<Archive>[]
+    curators:Curator[]
 
-    constructor(curators:Curator<Archive>[]){
+    constructor(curators:Curator[]){
         super()
         this.curators = curators
     }

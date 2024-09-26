@@ -1,15 +1,16 @@
+import { RequestHandler } from "express";
 import CommandOption, { ApplicationCommandOption } from "../CommandOption/CommandOption.ts";
 
 // command class role = have execution with name
 class Command implements ChatInputApplicationCommandData {
     name:string
     description:string
-    execution: Function
+    execution: RequestHandler
     options:CommandOption[] | undefined;
     defaultPermission: boolean | undefined
     type: number | undefined
 
-    constructor({ name, description, options, defaultPermission, type, execution }: ChatInputApplicationCommandData & {execution:Function}) {
+    constructor({ name, description, options, defaultPermission, type, execution }: ChatInputApplicationCommandData & {execution:RequestHandler}) {
         this.name = name
         this.description = description
         this.options = options

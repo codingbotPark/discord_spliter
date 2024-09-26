@@ -5,9 +5,6 @@ import SplitCommandCollector from "./SplitCommandCollector.ts";
 
 export type CommandCollector = Collector<Command, CommandBuilder>
 
-
-
-/** @THINK  */
 const commandCollectors:CommandCollector[] = [
     new SplitCommandCollector(new CommandBuilder()),
 ]

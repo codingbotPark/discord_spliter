@@ -2,15 +2,15 @@ import Archive from "../archive/Archive.ts";
 import Employee from "./Employee.ts"
 
 // curator class role = archiving for preparing data or caching data
-export default abstract class Curator<ArchiveType extends Archive> extends Employee{
+export default abstract class Curator extends Employee{
     abstract setupArchive():this
 
     private archivePlanList:Array<{key:string,plan:Promise<any>}> = []
-    private archive:ArchiveType
+    private static archive:Archive
 
-    constructor(archive:ArchiveType){
+    constructor(archive:Archive){
         super()
-        this.archive = archive
+        Curator.archive = archive
     }
 
     protected addArchivePlan(key:string, plan:Promise<any>){
@@ -23,7 +23,7 @@ export default abstract class Curator<ArchiveType extends Archive> extends Emplo
             const results = await Promise.all(archivePromises)
             results.forEach((result, idx) => {
                 const key = this.archivePlanList[idx].key
-                this.archive.addData(key, result)
+                Curator.addToArchive(key, result)
             })
         } catch (err) {
             throw new Error(String(err));
@@ -32,8 +32,12 @@ export default abstract class Curator<ArchiveType extends Archive> extends Emplo
         return this
     }
 
-    getFromArchive(key: string): any | undefined {
-        return this.archive.getData(key);
+    static addToArchive(key:string,value:any){
+        Curator.archive.addData(key,value)
+    }
+
+    static getFromArchive<ValueType=any>(key: string): ValueType | undefined {
+        return Curator.archive.getData(key) as ValueType;
     }
 
 }

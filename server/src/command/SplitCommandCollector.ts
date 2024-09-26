@@ -1,12 +1,9 @@
 import Collector from "../employee/Collector.ts";
-import { GuildMember, isHumanMember } from "../types/discordGuildMemberObject.type.ts";
-import DiscordRequest from "../util/discordRequest.ts";
-import { HTTPMethod } from "../util/httpMethod.ts";
-import { verifiedEnv } from "../util/verifyEnv.ts";
 import Command from "./Command/Command.ts";
 import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
 import { CommandArchive } from "../archive/CommandCurator.ts";
+import { Request, Response } from "express";
 
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
@@ -18,8 +15,8 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
             .set("name", "split")
             .set("type", 1)
             .set("description", "split void channel")
-            .set("execution", () => {
-                console.log("test1")
+            .set("execution", (req: Request, res: Response) => {
+                console.log("test")
             })
             // name should not include space char
             .set("options",[

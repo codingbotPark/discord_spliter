@@ -4,6 +4,7 @@ import DiscordRequest from "../util/discordRequest.ts";
 import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
+import CommandCurator, { CommandArchive } from "../archive/CommandCurator.ts";
 
 
 
@@ -18,8 +19,7 @@ class CommandManager extends Manager {
 
     manage(): void {
         const commands = this.commandCollectors.map((commandCollector) => commandCollector.collect().getCollection()).flat()
-        console.log(commands)
-        console.log(JSON.stringify(commands))
+        CommandCurator.addToArchive("commands",commands)
         this.installAllCommand(commands)
     }
 
@@ -28,6 +28,7 @@ class CommandManager extends Manager {
         const endpoint = `applications/${verifiedEnv.APP_ID}/commands`;
 
         try {
+            // DiscordRequest has 'command.json()' > function removed
             await DiscordRequest(endpoint, { method: HTTPMethod.PUT, body: commands });
             console.log("install commands successfully")
         } catch (err) {

@@ -1,11 +1,11 @@
 
 
-import Singleton from "../util/Singleton.ts";
-
 // Archive class role = caching data(include fetching) for using for collector
 // using singleton pattern
 export default class Archive{
     private static instance:Archive
+
+    /**@TODO search way to extend value type with key */
     private archiveData:Map<string, any>
 
     protected constructor(){
