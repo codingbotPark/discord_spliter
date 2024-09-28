@@ -20,11 +20,13 @@ class RouterManager extends Manager{
         this.routerCollectors.forEach((routerCollector:RouterCollector) => {
             routerCollector.collect().getCollection().forEach((router:Router) => {
 
-                router.stack.forEach((item) => {
-                    console.log(item.method,item.path, item.handle)
-                })
+                // router.stack.forEach((stack) => {
+                //     app.use(stack.handle)
+                // })
 
                 app.use(router)
+
+                
             })
         })
     }

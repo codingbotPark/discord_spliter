@@ -5,7 +5,7 @@ class CommandOption implements ApplicationCommandOption{
     name: string;
     description: string;
     required?: boolean;
-    choices?: Array<{ name: string; value: string | number }>;
+    choices?: ChoicesType;
     options?: CommandOption[];
     min_value?:number;
     max_value?:number;
@@ -35,6 +35,7 @@ export interface ApplicationCommandOption {
     max_value?:number;
 }
 
-export type ChoicesType = Array<{ name: string; value: string | number }>;
+export type ChoiceType = { name: string; value: string | number }
+export type ChoicesType = Array<ChoiceType>;
 
 export default CommandOption

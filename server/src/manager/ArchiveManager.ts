@@ -12,7 +12,6 @@ class ArchiveManager extends Manager{
     }
 
     manage(app: Express | undefined): void {
-        // console.log(CommandArchive.getInstance().getData("guildMemberChoices"))
     }
 
 }

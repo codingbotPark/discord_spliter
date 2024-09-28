@@ -4,7 +4,7 @@ import DiscordRequest from "../util/discordRequest.ts";
 import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
-import CommandCurator, { CommandArchive } from "../archive/CommandCurator.ts";
+import CommandCurator from "../archive/CommandCurator.ts";
 
 
 
@@ -20,6 +20,7 @@ class CommandManager extends Manager {
     manage(): void {
         const commands = this.commandCollectors.map((commandCollector) => commandCollector.collect().getCollection()).flat()
         CommandCurator.addToArchive("commands",commands)
+        console.log("commands",commands)
         this.installAllCommand(commands)
     }
 

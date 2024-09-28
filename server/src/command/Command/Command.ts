@@ -10,7 +10,7 @@ class Command implements ChatInputApplicationCommandData {
     defaultPermission: boolean | undefined
     type: number | undefined
 
-    constructor({ name, description, options, defaultPermission, type, execution }: ChatInputApplicationCommandData & {execution:RequestHandler}) {
+    constructor({ name, description, options, defaultPermission, type, execution }: CommandConstructorType) {
         this.name = name
         this.description = description
         this.options = options
@@ -21,6 +21,7 @@ class Command implements ChatInputApplicationCommandData {
 }
 
 // interface for command (similar with discordjs ChatInputApplicationCommandData)
+type CommandConstructorType = ChatInputApplicationCommandData &  {execution:RequestHandler}
 export interface ChatInputApplicationCommandData {
     name: string;
     description: string;

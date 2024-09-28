@@ -2,7 +2,7 @@ import Collector from "../employee/Collector.ts";
 import Command from "./Command/Command.ts";
 import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
-import CommandCurator, { CommandArchive } from "../archive/CommandCurator.ts";
+import CommandCurator  from "../archive/CommandCurator.ts";
 import { Request, Response } from "express";
 import { splitCommandHandler } from "./handlers/splitCommandHandler.ts";
 
@@ -26,7 +26,7 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     choices:[
                         {
                             name:"random",
-                            value:"split with randomly"
+                            value:"split with randomly",
                         },{
                             name:"game",
                             value:"split with game"

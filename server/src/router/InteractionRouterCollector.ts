@@ -16,7 +16,8 @@ class InteractionRouterCollector extends Collector<Router, RouterBuilder>{
             this.equipment
             .set("method",HTTPMethod.POST)
             .addHandler(verifyKeyMiddleware(verifiedEnv.PUBLIC_KEY))
-            .addHandler(CommandCurator.findExecutionFromCommand("split"))
+            // collector don't need to know handler
+            .addHandler(CommandCurator.findHandler)
             .build()
         )
 
