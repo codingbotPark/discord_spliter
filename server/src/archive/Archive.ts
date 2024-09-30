@@ -23,7 +23,7 @@ export default class Archive{
     }
 
     // Method to retrieve data from the archive
-    public getData<ValueType = any>(key: string): ValueType | undefined {
+    public getData(key: string): any {
         return this.archiveData.get(key);
     }
 

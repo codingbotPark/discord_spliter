@@ -15,7 +15,6 @@ class DiscordCurator extends Curator{
 
     setupArchive():this{
         this.addArchivePlan("client", this.connectDiscordJS())
-        this.addArchivePlan("members", this.getGuildMembers())
         return this
     }
 
@@ -30,40 +29,7 @@ class DiscordCurator extends Curator{
         })
         client.login(verifiedEnv.DISCORD_TOKEN)
         DiscordCurator.addToArchive("client",client)
-
-
         return client
-    }
-
-    async getGuildMembers(){
-        const client = DiscordCurator.getFromArchive<Client>("client")
-
-        if (!client) throw Error("there are no client")
-
-        client.once("ready", () => {
-            if (!client.user) {throw Error("not ready")}
-        })
-
-        const membersArray = await Promise.all(
-            client.guilds.cache.map(guild => guild.members.fetch())
-        ).catch((err) => {throw Error("fail to fetch guild memebrs")})
-
-        membersArray.forEach(members => {
-            members.forEach(member => {
-                if (member.presence) {
-                    console.log(`${member.user.tag} is ${member.presence.status}`);
-                    
-                    // 활동 중일 경우 활동 내용도 출력
-                    if (member.presence.activities.length > 0) {
-                        member.presence.activities.forEach(activity => {
-                            console.log(`Activity: ${activity.name}`);
-                        });
-                    }
-                }
-            });
-        });
-
-        return membersArray
     }
 }
 

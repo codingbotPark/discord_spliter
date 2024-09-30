@@ -26,7 +26,7 @@ class CommandCurator extends Curator{
         }
         if (type === InteractionType.APPLICATION_COMMAND){
             const {name} = data;
-            const commands = CommandArchive.getInstance().getData<Command[]>("commands")
+            const commands = CommandCurator.getFromArchive<Command[]>("commands")
             if (!commands){throw Error("commands are not added")}
     
             const execution = commands.find((command) => command.name === name)?.execution
