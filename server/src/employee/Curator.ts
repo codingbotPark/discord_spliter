@@ -38,6 +38,7 @@ export default abstract class Curator extends Employee{
 
     static getFromArchive<ValueType=any>(key: string): ValueType | undefined {
         return Curator.archive.getData(key) as ValueType;
+        
     }
 
 }

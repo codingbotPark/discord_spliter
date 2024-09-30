@@ -2,6 +2,7 @@ import { Server } from "http";
 import { Express } from "express";
 import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
+import { Client } from "discord.js";
 
 // ServerManager class role = turn on & off express server
 class ServerManager extends Manager {
@@ -31,6 +32,8 @@ class ServerManager extends Manager {
             // logging for closeing server
         })
     }
+    
+
 
 }
 

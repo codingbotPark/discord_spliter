@@ -33,7 +33,7 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
     }
     if (choices['method'] === undefined){ 
 
-
+        
     }
 
     // conside parallel fetching
@@ -57,3 +57,15 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
 
 
 
+
+// this.guild.shard.send({
+//     op: GatewayOpcodes.RequestGuildMembers,
+//     d: {
+//       guild_id: this.guild.id,
+//       presences,
+//       user_ids: users,
+//       query,
+//       nonce,
+//       limit,
+//     },
+//   });
