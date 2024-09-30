@@ -1,6 +1,7 @@
 import { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
+import PINGInteraction from "../middleware/PINGInteraction.ts";
 
 // RouterManager class role = set Routers to app
 class RouterManager extends Manager{
@@ -13,6 +14,7 @@ class RouterManager extends Manager{
     }
 
     manage(app:Express): void {
+        app.use(PINGInteraction)
         this.confirmRouters(app)
     }
 

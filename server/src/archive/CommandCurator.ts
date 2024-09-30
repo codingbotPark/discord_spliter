@@ -20,10 +20,7 @@ class CommandCurator extends Curator{
     static findHandler(req: Request, res: Response, next:NextFunction) {
 
         const { type, id, data } = req.body;
-
-        if (type === InteractionType.PING) {
-            return res.send({ type: InteractionResponseType.PONG });
-        }
+        
         if (type === InteractionType.APPLICATION_COMMAND){
             const {name} = data;
             const commands = CommandCurator.getFromArchive<Command[]>("commands")

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { ChoicesType, ChoiceType } from "../CommandOption/CommandOption";
 import DiscordRequest from "../../util/discordRequest.ts";
 import { HTTPMethod } from "../../util/httpMethod.ts";
+import { verifiedEnv } from "../../util/verifyEnv.ts";
 
 // return type in excuting against command
 interface SplitCommandReturnType{
@@ -15,6 +16,7 @@ interface SplitCommandReturnType{
 
 /** @TODO foo */
 export const splitCommandHandler = async (req: Request, res: Response) => {
+    const {guild_id} = req.body
     const data = req.body.data
     const options = data.options ?? [] as ChoicesType
 
@@ -35,14 +37,24 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
 
         
     }
-
-    // conside parallel fetching
-    const endPoint = `/users/@me`
-    const connection = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
+    const endPoint = `guilds/${guild_id}/members?limit=1000&with_presences=true`
+    const members = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
     .then((res) => res.json())
     .catch((err) => {throw Error(err)})
 
-    console.log("connection",connection)
+    members.forEach((member:any) => {
+        console.log(member)
+        console.log(`${member.user.username} is currently ${member.presence?.status || 'offline'}`);
+    });
+
+    
+    // // conside parallel fetching
+    // const endPoint = `/users/@me`
+    // const connection = await DiscordRequest(endPoint, {method:HTTPMethod.GET})
+    // .then((res) => res.json())
+    // .catch((err) => {throw Error(err)})
+
+    // console.log("connection",connection)
     
 
 
