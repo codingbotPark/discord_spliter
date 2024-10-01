@@ -31,6 +31,7 @@ class DiscordCurator extends Curator{
         DiscordCurator.addToArchive("client",client)
         return client
     }
+
 }
 
 export default DiscordCurator

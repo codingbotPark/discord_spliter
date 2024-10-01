@@ -1,4 +1,5 @@
 import { DiscordUser } from './discordUserObject.type.ts';  // User Object 타입을 미리 정의했다고 가정
+import { GuildMember as DiscordjsGuildMember } from 'discord.js';
 
 export type GuildMember = {
     user?: DiscordUser;  // User Object, 선택적 필드
@@ -15,5 +16,9 @@ export type GuildMember = {
 };
 
 export function isHumanMember(discordUser: GuildMember): discordUser is GuildMember & { user: NonNullable<DiscordUser> } {
+    return !!(discordUser.user && !discordUser.user.bot);
+}
+
+export function isDiscordHumanMember(discordUser: DiscordjsGuildMember): discordUser is DiscordjsGuildMember & { user: NonNullable<DiscordUser> } {
     return !!(discordUser.user && !discordUser.user.bot);
 }
