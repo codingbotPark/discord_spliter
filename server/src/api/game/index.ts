@@ -1,8 +1,8 @@
 
 
 export const gameAPI = {
-    "Overwatch":() => {},
-    "league of legends":() => {}
+    "league of legends":() => {},
+    "Valorant":() => {},
 }
 
 export type RegisteredGames = keyof typeof gameAPI

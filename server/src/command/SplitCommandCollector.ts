@@ -1,10 +1,16 @@
 import Collector from "../employee/Collector.ts";
 import Command from "./Command/Command.ts";
-import CommandOption, { ChoicesType } from "./CommandOption/CommandOption.ts";
+import CommandOption from "./CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
 import CommandCurator  from "../archive/CommandCurator.ts";
 import { Request, Response } from "express";
 import { splitCommandHandler } from "./handlers/splitCommandHandler.ts";
+
+export enum SplitMethod {
+    RANDOM = "random",
+    GAME = "game",
+}
+
 
 
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
@@ -26,10 +32,10 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     choices:[
                         {
                             name:"random",
-                            value:"split with randomly",
+                            value:"random",
                         },{
                             name:"game",
-                            value:"split with game"
+                            value:"game"
                         },
                     ]
                 }),
@@ -39,11 +45,11 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     type: 3,
                     choices:[
                         {
-                            name:"Overwatch",
-                            value:"1 overwatch"
-                        },{
                             name:"league of legends",
-                            value:"2 LOL"
+                            value:"LOL"
+                        },{
+                            name:"Valorant",
+                            value:"Valorant"
                         }
                     ]
                 }),
