@@ -4,7 +4,7 @@ import { ChoicesType, ChoiceType } from "../CommandOption/CommandOption";
 import { Client, Component, ComponentType, GuildMember, Message, TextInputStyle } from "discord.js";
 import DiscordCurator from "../../archive/DiscordCurator.ts";
 import { isDiscordHumanMember } from "../../types/discordGuildMemberObject.type.ts";
-import { gameAPI, isRegisteredGame, RegisteredGames } from "../../api/game/index.ts";
+import { gameAPI, isRegisteredGame, RegisteredGames } from "../../gameAPI/index.ts";
 import { SplitMethod } from "../SplitCommandCollector.ts";
 import { generateOptions } from "./components/generateOptions.ts";
 
@@ -45,13 +45,14 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
     // if currentUserActivity = undefined => samePrecenseHuman = []
     const samePrecenseHumans = precenseHumans.filter((human) => !!human.presence?.activities.find((act) => act.name === currentUserActivity))
 
-
+    
     // 못 나눌 때는 유저에게 선택 창을 보낸다
 
     if (samePrecenseHumans.values.length) {
 
         if (choices.method !== SplitMethod.RANDOM && isRegisteredGame(currentUserActivity!)) {
-            const members: any = gameAPI[currentUserActivity]() /**@TODO change */
+            const thirdPartyAPI = new gameAPI[currentUserActivity]() /**@TODO change */
+            const members = thirdPartyAPI.getSplitedMember(samePrecenseHumans)
             // discord activity type 이 뭔지 찾기
             // activity type 
             // 0 = playing game
@@ -96,7 +97,7 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
                             {
                                 type: MessageComponentTypes.STRING_SELECT,
                                 custom_id: "requestSplit1_method",
-                                placeholder: "spliting method",
+                                placeholder: "spliting method*",
                                 min_values: 1,
                                 max_values: 1,
                                 options: generateOptions([
@@ -116,7 +117,7 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
                             {
                                 type: MessageComponentTypes.STRING_SELECT,
                                 custom_id:"requestSplit2_game",
-                                placeholder:"game",
+                                placeholder:"game*",
                                 min_value:1,
                                 max_value:1,
                                 options:generateOptions([
@@ -185,8 +186,4 @@ async function getGuildMembers(guildId: string) {
 
 function isPresenceMember(member: GuildMember) {
     return member.presence
-}
-
-function getRandomMember(options: SplitCommandReturnType): Array<[]> {
-    return []
 }
