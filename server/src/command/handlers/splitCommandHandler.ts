@@ -1,12 +1,14 @@
-import { ButtonStyleTypes, InteractionResponseType, MessageComponentTypes } from "discord-interactions";
+import { ButtonStyleTypes, InteractionResponseType, InteractionType, MessageComponentTypes } from "discord-interactions";
 import { Request, Response } from "express";
 import { ChoicesType, ChoiceType } from "../CommandOption/CommandOption";
-import { Client, Component, ComponentType, GuildMember, Message, TextInputStyle } from "discord.js";
+import { ApplicationRoleConnectionMetadata, Client, Component, ComponentType, GuildMember, Message, TextInputStyle } from "discord.js";
 import DiscordCurator from "../../archive/DiscordCurator.ts";
 import { isDiscordHumanMember } from "../../types/discordGuildMemberObject.type.ts";
 import { gameAPI, isRegisteredGame, RegisteredGames } from "../../gameAPI/index.ts";
 import { SplitMethod } from "../SplitCommandCollector.ts";
 import { generateOptions } from "./components/generateOptions.ts";
+import DiscordRequest from "../../util/discordRequest.ts";
+import { HTTPMethod } from "../../util/httpMethod.ts";
 
 
 
@@ -21,9 +23,28 @@ interface SplitCommandReturnType {
 
 /** @TODO foo */
 export const splitCommandHandler = async (req: Request, res: Response) => {
+    const {data, type} = req.body
+
+    if (type === InteractionType.MESSAGE_COMPONENT){
+        const componentId = data.custom_id;
+
+        // if (componentId === 'my_select') {
+        //     console.log(req.body);
+      
+        //     // Get selected option from payload
+        //     const selectedOption = data.values[0];
+        //     const userId = req.body.member.user.id;
+      
+        //     // Send results
+        //     return res.send({
+        //       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        //       data: { content: `<@${userId}> selected ${selectedOption}` },
+        //     });
+        //   }
+    }
+
     const { guild_id } = req.body
     const { user } = req.body.member
-    const data = req.body.data
     // typed options getting with array
     const options = data.options ?? [] as ChoicesType
 
@@ -36,6 +57,7 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
     const guildMembers = await getGuildMembers(guild_id)
 
     const currentUser = guildMembers.get(user.id)
+    console.log("currentUser",currentUser)
     guildMembers.delete(user.id) // remove current user
 
     const currentUserPrecense = currentUser?.presence // precense or undefined
@@ -45,14 +67,23 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
     // if currentUserActivity = undefined => samePrecenseHuman = []
     const samePrecenseHumans = precenseHumans.filter((human) => !!human.presence?.activities.find((act) => act.name === currentUserActivity))
 
-    
+
+    const endPoint = `/users/@me/connections`
+    const discordRoleConnection = await DiscordRequest(endPoint,{method:HTTPMethod.GET})
+    console.log(discordRoleConnection.body)
+
     // 못 나눌 때는 유저에게 선택 창을 보낸다
 
     if (samePrecenseHumans.values.length) {
 
         if (choices.method !== SplitMethod.RANDOM && isRegisteredGame(currentUserActivity!)) {
             const thirdPartyAPI = new gameAPI[currentUserActivity]() /**@TODO change */
+
+
             const members = thirdPartyAPI.getSplitedMember(samePrecenseHumans)
+            
+
+
             // discord activity type 이 뭔지 찾기
             // activity type 
             // 0 = playing game

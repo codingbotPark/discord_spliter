@@ -1,6 +1,6 @@
-import GameAPI from "./GameAPI"
-import LeagueOfLegendsGameAPI from "./games/leagueOfLegends"
-import ValorantGameAPI from "./games/valorant"
+import GameAPI from "./GameAPI.ts"
+import LeagueOfLegendsGameAPI from "./games/leagueOfLegends.ts"
+import ValorantGameAPI from "./games/valorant.ts"
 
 
 export const gameAPI:Record<string,new () => GameAPI> = {

@@ -21,7 +21,7 @@ class CommandCurator extends Curator{
 
         const { type, id, data } = req.body;
         
-        if (type === InteractionType.APPLICATION_COMMAND){
+        if (type === InteractionType.APPLICATION_COMMAND || type === InteractionType.MESSAGE_COMPONENT){
             const {name} = data;
             const commands = CommandCurator.getFromArchive<Command[]>("commands")
             if (!commands){throw Error("commands are not added")}

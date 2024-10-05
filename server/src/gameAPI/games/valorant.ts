@@ -1,4 +1,4 @@
-import GameAPI from "../GameAPI";
+import GameAPI from "../GameAPI.ts";
 
 
 class ValorantGameAPI extends GameAPI{

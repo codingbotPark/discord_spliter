@@ -11,6 +11,7 @@ const zodObject = {
     PUBLIC_KEY: z.string(),
 
     GUILD_ID: z.string(),
+    RIOT_API_KEY:z.string()
 }
 type ZodSchemaType = ZodObject<typeof zodObject>;
 
@@ -21,7 +22,8 @@ function verifyEnv(envSchema:ZodSchemaType){
         APP_ID:process.env.APP_ID,
         DISCORD_TOKEN:process.env.DISCORD_TOKEN,
         PUBLIC_KEY:process.env.PUBLIC_KEY,
-        GUILD_ID:process.env.GUILD_ID
+        GUILD_ID:process.env.GUILD_ID,
+        RIOT_API_KEY:process.env.RIOT_API_KEY
     })
     if (envServer.error){
         // logging env setting error
