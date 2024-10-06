@@ -1,15 +1,13 @@
 import { ButtonStyleTypes, InteractionResponseType, InteractionType, MessageComponentTypes } from "discord-interactions";
 import { Request, Response } from "express";
-import { ChoicesType, ChoiceType } from "../CommandOption/CommandOption";
-import { ApplicationRoleConnectionMetadata, Client, Component, ComponentType, GuildMember, Message, TextInputStyle } from "discord.js";
-import DiscordCurator from "../../archive/DiscordCurator.ts";
-import { isDiscordHumanMember } from "../../types/discordGuildMemberObject.type.ts";
+import { ChoiceType, ChoicesType } from "../../command/CommandOption/CommandOption.ts";
+import {  GuildMember } from "discord.js";
 import { gameAPI, isRegisteredGame, RegisteredGames } from "../../gameAPI/index.ts";
-import { SplitMethod } from "../SplitCommandCollector.ts";
-import { generateOptions } from "./components/generateOptions.ts";
+import { SplitMethod } from "../../command/SplitCommandCollector.ts";
+import { generateOptions } from "../../components/generateOptions.ts";
 import DiscordRequest from "../../util/discordRequest.ts";
 import { HTTPMethod } from "../../util/httpMethod.ts";
-
+import discordUtil from "../../util/discordUtil"
 
 
 // return type in excuting against command
@@ -27,20 +25,6 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
 
     if (type === InteractionType.MESSAGE_COMPONENT){
         const componentId = data.custom_id;
-
-        // if (componentId === 'my_select') {
-        //     console.log(req.body);
-      
-        //     // Get selected option from payload
-        //     const selectedOption = data.values[0];
-        //     const userId = req.body.member.user.id;
-      
-        //     // Send results
-        //     return res.send({
-        //       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        //       data: { content: `<@${userId}> selected ${selectedOption}` },
-        //     });
-        //   }
     }
 
     const { guild_id } = req.body
@@ -63,7 +47,7 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
     const currentUserPrecense = currentUser?.presence // precense or undefined
     // prioritize get choices game, and get recently activity
     const currentUserActivity = currentUserPrecense?.activities.find((activity) => activity.name === choices["game"])?.name ?? currentUserPrecense?.activities[0].name
-    const precenseHumans = guildMembers.filter((guildMember) => isDiscordHumanMember(guildMember) && isPresenceMember(guildMember))
+    const precenseHumans = guildMembers.filter((guildMember) => discordUtil.guildUser.isDiscordHumanMember(guildMember) && isPresenceMember(guildMember))
     // if currentUserActivity = undefined => samePrecenseHuman = []
     const samePrecenseHumans = precenseHumans.filter((human) => !!human.presence?.activities.find((act) => act.name === currentUserActivity))
 
@@ -204,9 +188,6 @@ export const splitCommandHandler = async (req: Request, res: Response) => {
 
 
 async function getGuildMembers(guildId: string) {
-    const client = DiscordCurator.getFromArchive<Client>("client")
-    if (!client) throw Error("there are no client")
-
     const guild = client.guilds.cache.get(guildId)
     if (!guild) throw Error("there are no guild")
 

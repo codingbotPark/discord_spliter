@@ -3,7 +3,7 @@ import { Express } from "express";
 import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import { Client, Collection, GuildMember } from "discord.js";
-import DiscordCurator from "../archive/DiscordCurator.ts";
+import client from "../util/discordUtil/client.ts";
 
 // ServerManager class role = turn on & off express server
 class ServerManager extends Manager {
@@ -26,12 +26,17 @@ class ServerManager extends Manager {
             // logging for opening server
             console.log("listening port " + port)
         })
+        this.loginDiscordJS()
     }
 
     closeServer(){
         this.server?.close(() => {
             // logging for closeing server
         })
+    }
+
+    loginDiscordJS(){
+        client.login(verifiedEnv.DISCORD_TOKEN)
     }
     
 

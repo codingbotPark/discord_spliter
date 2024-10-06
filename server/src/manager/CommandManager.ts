@@ -4,8 +4,6 @@ import DiscordRequest from "../util/discordRequest.ts";
 import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
-import CommandCurator from "../archive/CommandCurator.ts";
-
 
 
 // install command to discord guild
@@ -18,9 +16,9 @@ class CommandManager extends Manager {
     }
 
     manage(): void {
-        const commands = this.commandCollectors.map((commandCollector) => commandCollector.collect().getCollection()).flat()
-        CommandCurator.addToArchive("commands",commands)
-        console.log("commands",commands)
+        this.commandCollectors.forEach((commandCollector) => commandCollector.collect())
+        const commands = this.commandCollectors.map((commandCollector) => commandCollector.getCollection()).flat()
+        // console.log(commands[0].options?.[3])
         this.installAllCommand(commands)
     }
 

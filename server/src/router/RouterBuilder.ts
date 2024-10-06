@@ -32,7 +32,6 @@ class RouterBuilder extends Builder<RouterTemplate, Router>{
         const path = normalizePath(this.basePath, this.building.subPath)
 
         // define router & use handler
-        
         const router = Router()[this.building.method](path,...this.building.handlers)
         return router
     }

@@ -19,7 +19,6 @@ class CommandOption implements ApplicationCommandOption{
         this.options = options.options
         this.min_value = options.min_value
         this.max_value = options.max_value
-
     }
 }
 

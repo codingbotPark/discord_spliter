@@ -5,23 +5,21 @@ import CommandOption, { ApplicationCommandOption } from "../CommandOption/Comman
 class Command implements ChatInputApplicationCommandData {
     name:string
     description:string
-    execution: RequestHandler
     options:CommandOption[] | undefined;
     defaultPermission: boolean | undefined
     type: number | undefined
 
-    constructor({ name, description, options, defaultPermission, type, execution }: CommandConstructorType) {
+    constructor({ name, description, options, defaultPermission, type }: ChatInputApplicationCommandData) {
         this.name = name
         this.description = description
         this.options = options
         this.defaultPermission = defaultPermission
         this.type = type
-        this.execution = execution
     }
 }
+export default Command
 
 // interface for command (similar with discordjs ChatInputApplicationCommandData)
-type CommandConstructorType = ChatInputApplicationCommandData &  {execution:RequestHandler}
 export interface ChatInputApplicationCommandData {
     name: string;
     description: string;
@@ -29,5 +27,3 @@ export interface ChatInputApplicationCommandData {
     defaultPermission?: boolean;
     type?: number;
 }
-
-export default Command

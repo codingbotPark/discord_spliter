@@ -6,9 +6,8 @@ class CommandBuilder extends Builder<Command>{
 
     private isCommand(data: Partial<Command>): data is Command {
         return (
-            typeof data.name === "string" &&
+            typeof data.name === "string"
             // typeof data.description === "string" &&
-            typeof data.execution === "function"
         );
     }
 

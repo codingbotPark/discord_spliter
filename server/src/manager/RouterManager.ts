@@ -1,4 +1,4 @@
-import { Express, Router } from "express";
+import express, { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
 import PINGInteraction from "../middleware/PINGInteraction.ts";
@@ -15,22 +15,15 @@ class RouterManager extends Manager{
 
     manage(app:Express): void {
         app.use(PINGInteraction)
+        app.use(express.json())
         this.confirmRouters(app)
     }
 
     confirmRouters(app:Express){
-        this.routerCollectors.forEach((routerCollector:RouterCollector) => {
-            routerCollector.collect().getCollection().forEach((router:Router) => {
-
-                // router.stack.forEach((stack) => {
-                //     app.use(stack.handle)
-                // })
-
-                app.use(router)
-
-                
-            })
-        })
+        this.routerCollectors.forEach((routerCollector) => routerCollector.collect())
+        this.routerCollectors.forEach((routerCollector) => routerCollector.getCollection().forEach((router) => {
+            app.use(router)
+        }))
     }
 
 }

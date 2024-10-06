@@ -10,7 +10,8 @@ abstract class Collector<Category, Equipment> extends Employee{
         this.equipment = equipment
     }
 
-    abstract collect(archives?:Object):this
+    // not return for async collect
+    abstract collect(archives?:Object):void
 
     getCollection():Category[]{
         return this.collection
