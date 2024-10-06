@@ -5,6 +5,10 @@ import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 
+export const commandSpecification = [
+    "test",
+    "split"
+] as const
 
 // install command to discord guild
 class CommandManager extends Manager {

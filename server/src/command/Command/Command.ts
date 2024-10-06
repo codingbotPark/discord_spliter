@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import CommandOption, { ApplicationCommandOption } from "../CommandOption/CommandOption.ts";
+import CommandOption, { ApplicationCommandOption } from "./CommandOption/CommandOption";
 
 // command class role = have execution with name
 class Command implements ChatInputApplicationCommandData {

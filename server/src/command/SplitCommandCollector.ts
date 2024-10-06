@@ -1,8 +1,7 @@
 import Collector from "../employee/Collector.ts";
 import Command from "./Command/Command.ts";
-import CommandOption from "./CommandOption/CommandOption.ts";
+import CommandOption from "./Command/CommandOption/CommandOption.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
-import discordUtil from "../util/discordUtil/index.ts";
 
 export enum SplitMethod {
     RANDOM = "random",

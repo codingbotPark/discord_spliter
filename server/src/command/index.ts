@@ -10,3 +10,5 @@ const commandCollectors:CommandCollector[] = [
 ]
 
 export default commandCollectors
+
+

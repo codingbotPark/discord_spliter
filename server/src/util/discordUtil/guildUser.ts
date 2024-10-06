@@ -1,6 +1,6 @@
 import {  GuildMember } from "discord.js";
-import { ChoicesType } from "../../command/CommandOption/CommandOption";
 import client from "./client.ts";
+import { ChoicesType } from "../../command/Command/CommandOption/CommandOption.ts";
 
 
 export async function getGuildUser(guildID:string){
