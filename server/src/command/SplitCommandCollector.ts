@@ -56,12 +56,12 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                     max_value:10,
                     type:4
                 }),
-                new CommandOption({
-                    name:"exclude_user",
-                    description:"exclude changing member",
-                    type:3,
-                    // choices:
-                })
+                // new CommandOption({
+                //     name:"exclude_user",
+                //     description:"exclude changing member",
+                //     type:3,
+                //     // choices: there are no way to get member in once command install 
+                // })
             ])
             .build()
         )

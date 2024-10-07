@@ -14,6 +14,8 @@ export async function getGuildUser(guildID:string){
             value:discordUser.user.id
         }
     ))
+
+    return guildMemberChoices
 }
 
 
