@@ -11,7 +11,7 @@ abstract class Collector<Category, Equipment> extends Employee{
     }
 
     // not return for async collect
-    abstract collect(archives?:Object):void
+    abstract collect():void
 
     getCollection():Category[]{
         return this.collection

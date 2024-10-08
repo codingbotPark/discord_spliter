@@ -1,65 +1,9 @@
-import { RequestHandler } from "express";
-import { ChoicesType, ChoiceType } from "../../command/Command/CommandOption/CommandOption";
-import { SplitMethod } from "../../command/SplitCommandCollector";
-import { RegisteredGames } from "../../gameAPI";
-import { APIActionRowComponent, APIInteractionResponse, APIStringSelectComponent, APIUserSelectComponent, ComponentType, InteractionResponseType } from "discord.js";
-import { setDefaultOption } from "./setDefaultOption";
-import { MessageComponentTypes } from "discord-interactions";
-
-// return type in excuting against command
-interface SplitInfoType {
-    excludeUser?: Array<string>;
-    method?: SplitMethod,
-    channel_number?: number,
-    game?: RegisteredGames,
-}
-function choicesToSplitInfo(choices:ChoicesType):SplitInfoType{
-    return choices.reduce((obj: { [key: string]: string | number }, option: ChoiceType) => {
-        obj[option.name] = option.value
-        return obj
-    }, {})
-}
+import { APIActionRowComponent, APIButtonComponent, APIInteractionResponse, APIStringSelectComponent, APIUserSelectComponent, ButtonStyle, ComponentType, InteractionResponseType } from "discord.js";
+import { SplitInfoType } from "./split";
+import { setDefaultOption } from "../setDefaultOption.ts";
 
 
-interface CompletedSplitInfoType extends SplitInfoType {
-    method:SplitMethod,
-    game:RegisteredGames,
-}
-function areOptionsCompleted(splitInfo:SplitInfoType):splitInfo is CompletedSplitInfoType{
-    return !!(splitInfo.method && splitInfo.game)
-}
-function fillOptions(splitInfo:SplitInfoType):SplitInfoType{
-    // working to find options
-
-    return splitInfo;
-}
-
-
-const split:RequestHandler = async(req, res) => {
-    const {guild_id, data} = req.body
-    const {user} = req.body.member
-    
-    const options = data.options as ChoicesType
-    const splitInformation: SplitInfoType = choicesToSplitInfo(options)
-    const confirmedSplitInfo = fillOptions(splitInformation)
-    
-    if (!areOptionsCompleted(confirmedSplitInfo)){ // return component to fill info
-        return res.send(makeNeedInfoComponent(confirmedSplitInfo))
-    }
-
-    // get splited member
-    
-    
-
- 
-}
-
-export default split
-
-
-
-
-function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{
+export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{
     return {
         type:InteractionResponseType.ChannelMessageWithSource,
         data:{
@@ -70,7 +14,7 @@ function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{
                     components:[
                         {
                             type:ComponentType.StringSelect,
-                            custom_id: "requestSplit1_method",
+                            custom_id: "split_requestSplit1_method",
                             placeholder: "spliting method*",
                             min_values: 1,
                             max_values: 1,
@@ -138,6 +82,17 @@ function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{
                         }
                     ]
                 } as APIActionRowComponent<APIUserSelectComponent>,
+                {
+                    type:ComponentType.ActionRow,
+                    components:[
+                        {
+                            type: ComponentType.Button,
+                            custom_id: "split_submit",
+                            label: "submit",
+                            style: ButtonStyle.Primary
+                        }
+                    ]
+                } as APIActionRowComponent<APIButtonComponent>
             ]
         }
     }

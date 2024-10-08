@@ -1,6 +1,7 @@
 import express, { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
+import cors from 'cors'
 
 // RouterManager class role = set Routers to app
 class RouterManager extends Manager{
@@ -13,8 +14,15 @@ class RouterManager extends Manager{
     }
 
     manage(app:Express): void {
-        app.use(express.json())
         this.confirmRouters(app)
+    }
+
+    setMiddleWares(app:Express){
+        app.use(express.json())
+        // app.use(cors({
+        //     origin: '*', // 필요한 경우 특정 도메인으로 제한할 수 있습니다.
+        //     credentials: true,
+        // }));
     }
 
     confirmRouters(app:Express){

@@ -11,3 +11,5 @@ export function confirmHandler(handler?:RequestHandler):RequestHandler{
     if (handler) return handler
     throw Error("handler is not ReuqestHandler type")
 }
+
+export type MessageComponentObj = Record<string, RequestHandler>

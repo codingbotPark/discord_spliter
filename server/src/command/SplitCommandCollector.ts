@@ -13,7 +13,7 @@ export enum SplitMethod {
 class SplitCommandCollector extends Collector<Command, CommandBuilder>{
 
 
-    async collect() {
+    collect() {
         this.addItemToCollection(
             this.equipment
             .set("name", "split")
@@ -64,14 +64,6 @@ class SplitCommandCollector extends Collector<Command, CommandBuilder>{
                 // })
             ])
             .build()
-        )
-
-        this.addItemToCollection(
-            new Command({
-                type: 1,
-                description:"test",
-                name: 'test',
-            })
         )
 
     }

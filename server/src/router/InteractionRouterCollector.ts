@@ -4,8 +4,8 @@ import RouterBuilder from "./RouterBuilder.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 import { verifyKeyMiddleware } from "discord-interactions";
 import { verifiedEnv } from "../util/verifyEnv.ts";
+import { confirmHandler } from "../handlers/Handler.ts";
 import interactionHandler from "../handlers/interactions/index.ts";
-import { confirmHandler } from "../handlers/\bHandler.ts";
 
 
 class InteractionRouterCollector extends Collector<Router, RouterBuilder>{

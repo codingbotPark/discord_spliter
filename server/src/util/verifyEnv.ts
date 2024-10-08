@@ -11,6 +11,12 @@ const zodObject = {
     PUBLIC_KEY: z.string(),
 
     GUILD_ID: z.string(),
+
+    CLIENT_ID:z.string(),
+    CLIENT_SECRET:z.string(),
+    REDIRECT_URI:z.string(),
+    INTERACTION_URI:z.string(),
+
     RIOT_API_KEY:z.string()
 }
 type ZodSchemaType = ZodObject<typeof zodObject>;
@@ -23,6 +29,12 @@ function verifyEnv(envSchema:ZodSchemaType){
         DISCORD_TOKEN:process.env.DISCORD_TOKEN,
         PUBLIC_KEY:process.env.PUBLIC_KEY,
         GUILD_ID:process.env.GUILD_ID,
+
+        CLIENT_ID:process.env.CLIENT_ID,
+        CLIENT_SECRET:process.env.CLIENT_SECRET,
+        REDIRECT_URI:process.env.REDIRECT_URI,
+        INTERACTION_URI:process.env.INTERACTION_URI,
+
         RIOT_API_KEY:process.env.RIOT_API_KEY
     })
     if (envServer.error){

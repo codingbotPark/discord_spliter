@@ -1,21 +1,40 @@
 import { RequestHandler} from "express"
-import Handler from "../\bHandler"
-import { HTTPMethod } from "../../util/httpMethod"
+import Handler, { MessageComponentObj } from "../Handler"
+import { HTTPMethod } from "../../util/httpMethod.ts"
 import {  InteractionResponseType, InteractionType } from "discord-interactions";
-import { commandSpecification } from "../../manager/CommandManager";
-import split from "./split";
+import { commandSpecification } from "../../manager/CommandManager.ts";
+import split from "./split/split.ts";
+import splitMessageComponent from "./split/splitMessage.ts";
+import test from "./test/test.ts";
 
 
 const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {
-    "test":() => {},
+    "test":test,
     "split":split
 }
 function isCommand(commandName:any):commandName is typeof commandSpecification[number]{
     return commandSpecification.includes(commandName)
 }
 
-const interactionClassifier:RequestHandler =  (req , res, next) => {
 
+const messageComponents:Record<string, MessageComponentObj> = {
+    "split":splitMessageComponent
+}
+function getMessageIDs(customID:string){
+    const [messageID, ...componentIDParts] = customID.split("_");
+    if (!messageID || !componentIDParts.length) throw Error("Invalid customID");
+
+    const componentID = componentIDParts.join("_");
+
+    return {componentID, messageID}
+}
+function isMessageComponentHandler(componentID:string, messageID:string):boolean{
+    return messageID in messageComponents && componentID in messageComponents[messageID];
+}
+
+
+const interactionClassifier:RequestHandler =  (req , res, next) => {
+    
     // interaction type
     const { type, data} = req.body;
     
@@ -29,9 +48,11 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
         applicationCommands[commandName](req,res,next)
 
     } else if (type === InteractionType.MESSAGE_COMPONENT){
-        const componentId = data.custom_id
-
+        const customID = data.custom_id
         
+        const {componentID, messageID} = getMessageIDs(customID)
+        if(!isMessageComponentHandler(componentID, messageID)){throw Error("unknown message component")}
+
     }
 }
 
