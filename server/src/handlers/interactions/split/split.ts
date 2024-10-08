@@ -1,10 +1,9 @@
-import { RequestHandler } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { ChoicesType, ChoiceType } from "../../../command/Command/CommandOption/CommandOption";
 import { SplitMethod } from "../../../command/SplitCommandCollector";
 import { RegisteredGames } from "../../../gameAPI";
-import { makeNeedInfoComponent } from "./components.ts";
-import DiscordRequest from "../../../util/discordRequest.ts";
-import { HTTPMethod } from "../../../util/httpMethod.ts";
+import { makeNeedInfoComponent } from "../components/split.ts";
+import { makeAuthAllowComponent } from "../components/OAuth.ts";
 import { verifiedEnv } from "../../../util/verifyEnv.ts";
 
 // return type in excuting against command
@@ -44,23 +43,29 @@ const split:RequestHandler = async(req, res) => {
     const splitInformation: SplitInfoType = choicesToSplitInfo(options)
     const confirmedSplitInfo = fillOptions(splitInformation)
 
-    const clientId = verifiedEnv.CLIENT_ID;
-    const redirectUri = encodeURIComponent(verifiedEnv.REDIRECT_URI);
-    const scope = 'identify connections';
-    const responseType = 'code';
-    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;    
-    
-    
-    // if (!areOptionsCompleted(confirmedSplitInfo)){ // return component to fill info
-    //     return res.send(makeNeedInfoComponent(confirmedSplitInfo))
-    // }
+    if (!areOptionsCompleted(confirmedSplitInfo)){ // return component to fill info
+        return res.send(makeNeedInfoComponent(confirmedSplitInfo))
+    }
 
     // get accessToken to get connection
-    console.log("imhere1")
     const accessToken = req.query.token
-    console.log("imhere2", !accessToken)
-    if (!accessToken) {return res.redirect(discordAuthUrl)}
-    console.log("imhere4")
+    if (!accessToken) {
+        return res.send(makeAuthAllowComponent({content:`need allow to access your profile`}))
+    }
+    
+    // Fetch user connections using the access token
+    const connectionsResponse = await fetch('https://discord.com/api/v10/users/@me/connections', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!connectionsResponse.ok) {
+        throw new Error(`Fetching connections failed: ${connectionsResponse.status}`);
+    }
+
+    const connections = await connectionsResponse.json();
 
     // get splited member
 

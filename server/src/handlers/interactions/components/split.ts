@@ -1,6 +1,6 @@
 import { APIActionRowComponent, APIButtonComponent, APIInteractionResponse, APIStringSelectComponent, APIUserSelectComponent, ButtonStyle, ComponentType, InteractionResponseType } from "discord.js";
-import { SplitInfoType } from "./split";
 import { setDefaultOption } from "../setDefaultOption.ts";
+import { SplitInfoType } from "../split/split.ts";
 
 
 export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{
@@ -50,9 +50,9 @@ export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionRes
                                     description:"using Valorant API"
                                 }
                             ])
-                        }
+                        } as APIStringSelectComponent
                     ]
-                } as APIActionRowComponent<APIStringSelectComponent>,
+                },
                 {
                     type:ComponentType.ActionRow,
                     components:[
@@ -67,9 +67,9 @@ export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionRes
                                     const index = idx + 1;
                                     return { label: index.toString(), value: index.toString() };
                                 }), splitInfo["channel_number"]?.toString() ?? "2")
-                        }
+                        } as APIStringSelectComponent
                     ]
-                } as APIActionRowComponent<APIStringSelectComponent>,
+                },
                 {
                     type:ComponentType.ActionRow,
                     components:[
@@ -81,7 +81,7 @@ export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionRes
                             max_values:25,
                         }
                     ]
-                } as APIActionRowComponent<APIUserSelectComponent>,
+                },
                 {
                     type:ComponentType.ActionRow,
                     components:[
@@ -92,8 +92,9 @@ export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionRes
                             style: ButtonStyle.Primary
                         }
                     ]
-                } as APIActionRowComponent<APIButtonComponent>
+                }
             ]
         }
     }
 }
+

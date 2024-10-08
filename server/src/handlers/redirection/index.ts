@@ -2,11 +2,12 @@ import { RequestHandler } from "express";
 import { HTTPMethod } from "../../util/httpMethod.ts";
 import Handler from "../Handler.ts";
 import { verifiedEnv } from "../../util/verifyEnv.ts";
+import { InteractionResponseType } from "discord.js";
 
 
 const redirectionGetHandler:RequestHandler = async(req,res) => {
+    // there is code after auth redirecting
     const code = req.query.code as string;
-    console.log("imhere3", code)
     if (!code) throw Error("there are no code")
             
     const params = new URLSearchParams()
@@ -14,6 +15,7 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
     params.append('client_secret', verifiedEnv.CLIENT_SECRET);
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
+    // redirectUri should match with define in app setting
     params.append('redirect_uri', verifiedEnv.REDIRECT_URI);
     params.append('scope', 'identify connections')
 
@@ -32,25 +34,17 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
     const tokenData = await response.json()
     const accessToken = tokenData.access_token;
 
-            // Fetch user connections using the access token
-            const connectionsResponse = await fetch('https://discord.com/api/v10/users/@me/connections', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                },
-            });
-    
-            if (!connectionsResponse.ok) {
-                throw new Error(`Fetching connections failed: ${connectionsResponse.status}`);
-            }
-    
-            const connections = await connectionsResponse.json();
-            console.log(connections); // Third-party connections data
+    if (!accessToken){ throw Error("there are no accessToken")}
 
-    return res.redirect("/interactions")
-    // const accessToken = response.data.access_token;
-    // accessToken으로 Discord API 요청 가능
-    
+    // session 에 저장
+
+
+    return res.send({
+        type:InteractionResponseType.ChannelMessageWithSource,
+        data:{
+            content:"hi"
+        }
+    })
 }
 
 const redirectionHandler: Handler = {}
