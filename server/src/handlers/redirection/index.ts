@@ -3,7 +3,11 @@ import { HTTPMethod } from "../../util/httpMethod.ts";
 import Handler from "../Handler.ts";
 import { verifiedEnv } from "../../util/verifyEnv.ts";
 import { InteractionResponseType } from "discord.js";
+import path, { dirname } from "path";
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const redirectionGetHandler:RequestHandler = async(req,res) => {
     // there is code after auth redirecting
@@ -36,18 +40,13 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
 
     if (!accessToken){ throw Error("there are no accessToken")}
 
-    // session 에 저장
+    // save session but EXPECTION = IT's NOT WORK => save session after request in redirectPage
 
-
-    return res.send({
-        type:InteractionResponseType.ChannelMessageWithSource,
-        data:{
-            content:"hi"
-        }
-    })
+    console.log(__dirname)
+    return res.sendFile(path.join(__dirname, 'redirectPage.html'));
 }
-
 const redirectionHandler: Handler = {}
 redirectionHandler[HTTPMethod.GET] = redirectionGetHandler
 
 export default redirectionHandler
+

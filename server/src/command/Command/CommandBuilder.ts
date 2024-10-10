@@ -17,7 +17,9 @@ class CommandBuilder extends Builder<Command>{
             throw Error()
             // missing require property 
         }
-        return new Command(this.building)
+        const result = new Command(this.building)
+        this.clear()
+        return result
     }
 }
 

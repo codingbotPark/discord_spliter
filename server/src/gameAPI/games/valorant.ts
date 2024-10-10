@@ -1,8 +1,8 @@
 import GameAPI from "../GameAPI.ts";
 
 
-class ValorantGameAPI extends GameAPI{
-    getSplitedMember(){
+class ValorantGameAPI implements GameAPI{
+    getMembersWithMatch(){
         return []
     }
 }

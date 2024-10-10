@@ -17,7 +17,9 @@ const zodObject = {
     REDIRECT_URI:z.string(),
     INTERACTION_URI:z.string(),
 
-    RIOT_API_KEY:z.string()
+    SESSION_KEY:z.string(),
+
+    RIOT_API_KEY:z.string(),
 }
 type ZodSchemaType = ZodObject<typeof zodObject>;
 
@@ -34,6 +36,8 @@ function verifyEnv(envSchema:ZodSchemaType){
         CLIENT_SECRET:process.env.CLIENT_SECRET,
         REDIRECT_URI:process.env.REDIRECT_URI,
         INTERACTION_URI:process.env.INTERACTION_URI,
+
+        SESSION_KEY:process.env.SESSION_KEY,
 
         RIOT_API_KEY:process.env.RIOT_API_KEY
     })

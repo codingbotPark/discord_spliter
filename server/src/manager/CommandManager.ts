@@ -22,7 +22,7 @@ class CommandManager extends Manager {
     manage(): void {
         this.commandCollectors.forEach((commandCollector) => commandCollector.collect())
         const commands = this.commandCollectors.map((commandCollector) => commandCollector.getCollection()).flat()
-        // console.log(commands[0].options?.[3])
+        console.log(commands)
         this.installAllCommand(commands)
     }
 

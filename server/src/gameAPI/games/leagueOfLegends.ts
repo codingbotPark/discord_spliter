@@ -1,8 +1,12 @@
 import { verifiedEnv } from "../../util/verifyEnv.ts";
 import GameAPI from "../GameAPI.ts";
 
-class LeagueOfLegendsGameAPI extends GameAPI{
-    getSplitedMember(){
+class LeagueOfLegendsGameAPI implements GameAPI{
+    splitWithTier(){
+        return []
+    }
+
+    getMembersWithMatch(){
         // const [gameName, tagLine] = me.payload.split("#")
         const [gameName, tagLine] = ["박모씨","#12345"]
         const region = "kr"

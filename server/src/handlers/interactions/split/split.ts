@@ -4,7 +4,7 @@ import { SplitMethod } from "../../../command/SplitCommandCollector";
 import { RegisteredGames } from "../../../gameAPI";
 import { makeNeedInfoComponent } from "../components/split.ts";
 import { makeAuthAllowComponent } from "../components/OAuth.ts";
-import { verifiedEnv } from "../../../util/verifyEnv.ts";
+import { APIConnection, ConnectionService } from "discord.js";
 
 // return type in excuting against command
 export interface SplitInfoType {
@@ -48,11 +48,22 @@ const split:RequestHandler = async(req, res) => {
     }
 
     // get accessToken to get connection
-    const accessToken = req.query.token
+    const accessToken = req.query.token as string
     if (!accessToken) {
         return res.send(makeAuthAllowComponent({content:`need allow to access your profile`}))
     }
     
+    const appConnections = getUserConnections(accessToken)
+    
+    // get splited member
+
+ 
+}
+
+export default split
+
+
+async function getUserConnections(accessToken:string):Promise<APIConnection[]>{
     // Fetch user connections using the access token
     const connectionsResponse = await fetch('https://discord.com/api/v10/users/@me/connections', {
         method: 'GET',
@@ -66,13 +77,8 @@ const split:RequestHandler = async(req, res) => {
     }
 
     const connections = await connectionsResponse.json();
-
-    // get splited member
-
- 
+    return connections as APIConnection[]
 }
-
-export default split
 
 
 

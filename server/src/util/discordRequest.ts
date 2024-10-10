@@ -29,7 +29,7 @@ export default async function DiscordRequest(endpoint:string, options:discordReq
 
     // throw API errors
     if (!res.ok) {
-      const data = res.json();
+      const data = await res.json();
       console.log(res.status);
       throw new Error(JSON.stringify(data));
     }

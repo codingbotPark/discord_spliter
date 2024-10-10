@@ -8,6 +8,10 @@ abstract class Builder<Building, ReturnType = Building> extends Employee{
         this.building[key] = value
         return this
     }
+    clear(){
+        this.building = {}
+        return this
+    }
 
     abstract build():ReturnType; 
 }
