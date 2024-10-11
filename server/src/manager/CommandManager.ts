@@ -4,10 +4,12 @@ import DiscordRequest from "../util/discordRequest.ts";
 import commandCollectors, { CommandCollector } from "../command/index.ts";
 import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
+import gameAPI from "../gameAPI/index.ts";
 
 export const commandSpecification = [
     "test",
-    "split"
+    "split",
+    ...Object.keys(gameAPI)
 ] as const
 
 // install command to discord guild

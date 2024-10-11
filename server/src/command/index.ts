@@ -1,4 +1,5 @@
 import Collector from "../employee/Collector.ts";
+import ChannelCommandCollector from "./ChannelCommandCollector.ts";
 import Command from "./Command/Command.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
 import gameCommandCollector from "./gameCommandCollector.ts";
@@ -11,6 +12,7 @@ const commandCollectors:CommandCollector[] = [
     new SplitCommandCollector(new CommandBuilder()),
     new TestCommandCollector(new CommandBuilder()),
     new gameCommandCollector(new CommandBuilder()),
+    new ChannelCommandCollector(new CommandBuilder())
 ]
 
 export default commandCollectors

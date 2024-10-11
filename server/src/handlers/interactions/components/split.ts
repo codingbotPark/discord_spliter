@@ -1,6 +1,6 @@
 import { APIActionRowComponent, APIButtonComponent, APIInteractionResponse, APIStringSelectComponent, APIUserSelectComponent, ButtonStyle, ComponentType, InteractionResponseType } from "discord.js";
-import { setDefaultOption } from "../setDefaultOption.ts";
-import { SplitInfoType } from "../split/split.ts";
+import { setDefaultOption } from "./setDefaultOption.ts";
+import { SplitInfoType } from "../split/splitHandler.ts";
 
 
 export function makeNeedInfoComponent(splitInfo:SplitInfoType):APIInteractionResponse{

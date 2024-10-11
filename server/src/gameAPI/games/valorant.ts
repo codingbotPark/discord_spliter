@@ -1,9 +1,10 @@
+import { Request, Response } from "express";
 import GameAPI from "../GameAPI.ts";
 
 
 class ValorantGameAPI implements GameAPI{
-    getMembersWithMatch(){
-        return []
+    splitWithMatch(req: Request, res: Response): Response {
+        return res
     }
 }
 

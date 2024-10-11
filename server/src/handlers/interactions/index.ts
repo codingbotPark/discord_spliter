@@ -1,16 +1,22 @@
-import { RequestHandler} from "express"
+import { Request, RequestHandler} from "express"
 import Handler, { MessageComponentObj } from "../Handler"
 import { HTTPMethod } from "../../util/httpMethod.ts"
 import {  InteractionResponseType, InteractionType } from "discord-interactions";
 import { commandSpecification } from "../../manager/CommandManager.ts";
-import split from "./split/split.ts";
+import splitHandler from "./split/splitHandler.ts";
 import splitMessageComponent from "./split/splitMessage.ts";
 import test from "./test/test.ts";
+import gameHandler from "./game/gameHandler.ts";
+import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
 
 
 const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {
     "test":test,
-    "split":split
+    "split":splitHandler,
+    ...Object.keys(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, curr:string) => {
+        gameAPIObj[curr] = gameHandler
+        return gameAPIObj
+    }, {})
 }
 function isCommand(commandName:any):commandName is typeof commandSpecification[number]{
     return commandSpecification.includes(commandName)
@@ -60,5 +66,4 @@ const interactionHandler: Handler = {}
 interactionHandler[HTTPMethod.POST] = interactionClassifier
 
 export default interactionHandler
-
 

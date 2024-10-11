@@ -18,8 +18,10 @@
     },
     "include": [
         "src/**/*",
+        "src/global.d.ts",
         "environment.d.ts"
     ],
+    "files": ["src/global.d.ts"],
     "exclude": [
         "node_modules",
     ]

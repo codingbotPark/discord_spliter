@@ -1,9 +1,15 @@
-import GameAPI, { SplitedMemberType } from "../GameAPI";
+import { Request, Response } from "express";
+import GameAPI from "../GameAPI";
+import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth.ts";
 
 
 class OverwatchGameAPI implements GameAPI{
-    splitWithTier(): SplitedMemberType {
-        return []
+    splitWithTier(req: Request, res: Response): boolean {
+        if(!req.session.token){
+            res.send(makeAuthAllowComponent({content:`need allow to access your profile`}))
+        }
+
+        return true
     }
 }
 

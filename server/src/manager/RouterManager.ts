@@ -1,7 +1,6 @@
 import express, { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
-import cors from 'cors'
 import session from "express-session";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 
@@ -16,6 +15,7 @@ class RouterManager extends Manager{
     }
 
     manage(app:Express): void {
+        this.setMiddleWares(app)
         this.confirmRouters(app)
     }
 
@@ -26,6 +26,7 @@ class RouterManager extends Manager{
             resave: false,           // not save for no changing
             saveUninitialized: true, 
             cookie: { secure: false } // set true if using https
+
         }));
     }
 

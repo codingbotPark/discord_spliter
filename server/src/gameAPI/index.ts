@@ -9,6 +9,9 @@ const gameAPI:Record<string, GameAPI> = {
     "valorant":new ValorantGameAPI(),
     'overwatch':new OverwatchGameAPI()
 }
+export const gameNameShortCut:Record<string, string> = {
+    "lol":"league of legends"
+}
 
 export default gameAPI
 

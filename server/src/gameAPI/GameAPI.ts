@@ -2,22 +2,22 @@
 // index 0 = channel 1 ...
 
 import { Collection, GuildMember } from "discord.js"
+import { Request, RequestHandler, Response } from "express";
 
 // string = discord user id
-export type SplitedMemberType = Array<string[]>
 
 interface GameAPI{
     // if the game provide match history with players
-    getMembersWithMatch?(discordMembers:Collection<string, GuildMember>):SplitedMemberType;
+    splitWithMatch?(req:Request, res:Response):boolean;
     // if the game provide tier with user ID
-    splitWithTier?():SplitedMemberType;
+    splitWithTier?(req:Request, res:Response):boolean;
 }
+
 
 export default GameAPI
 
 // map for using in user command
 export const apiNameMap:Record<string, string> = {
-    "getMembersWithMatch":"matched member",
+    "splitWithMatch":"matched member",
     "splitWithTier":"tier, proficiency"
 }
-

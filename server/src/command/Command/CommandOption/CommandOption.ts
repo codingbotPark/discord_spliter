@@ -9,6 +9,7 @@ class CommandOption implements ApplicationCommandOption{
     options?: CommandOption[];
     min_value?:number;
     max_value?:number;
+    channel_types?:number[]
 
     constructor(options:ApplicationCommandOption){
         this.type = options.type
@@ -19,6 +20,7 @@ class CommandOption implements ApplicationCommandOption{
         this.options = options.options
         this.min_value = options.min_value
         this.max_value = options.max_value
+        this.channel_types = options.channel_types
     }
 }
 
@@ -32,9 +34,11 @@ export interface ApplicationCommandOption {
     options?: ApplicationCommandOption[];
     min_value?:number;
     max_value?:number;
+    channel_types?:number[]
 }
 
-export type ChoiceType = { name: string; value: string | number }
+export type ChoiceType = { name: string; value: string | number | boolean }
 export type ChoicesType = Array<ChoiceType>;
+
 
 export default CommandOption

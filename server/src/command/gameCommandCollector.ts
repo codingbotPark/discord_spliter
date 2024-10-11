@@ -1,5 +1,5 @@
 import Collector from "../employee/Collector.ts";
-import gameAPI from "../gameAPI/index.ts";
+import gameAPI, { gameNameShortCut } from "../gameAPI/index.ts";
 import GameAPI, { apiNameMap } from "../gameAPI/GameAPI.ts";
 import Command from "./Command/Command.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
@@ -30,7 +30,7 @@ class gameCommandCollector extends Collector<Command, CommandBuilder> {
             this.addItemToCollection(
                 this.equipment
                 .set("name", gameName)
-                .set("description", `commands for ${gameName}`)
+                .set("description", `commands for ${gameNameShortCut[gameName] ?? gameName}`)
                 .set("type", 1)
                 .set("options", [
                     new CommandOption({
@@ -47,3 +47,8 @@ class gameCommandCollector extends Collector<Command, CommandBuilder> {
 }
 
 export default gameCommandCollector
+
+
+export interface gameCommandOption{
+    using?:keyof GameAPI
+}

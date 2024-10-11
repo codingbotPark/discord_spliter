@@ -1,10 +1,11 @@
 import { Request, RequestHandler, Response } from "express";
-import { ChoicesType, ChoiceType } from "../../../command/Command/CommandOption/CommandOption";
-import { SplitMethod } from "../../../command/SplitCommandCollector";
-import { RegisteredGames } from "../../../gameAPI";
+import { ChoicesType, ChoiceType } from "../../../command/Command/CommandOption/CommandOption.ts";
+import { SplitMethod } from "../../../command/SplitCommandCollector.ts";
+import { RegisteredGames } from "../../../gameAPI/index.ts";
 import { makeNeedInfoComponent } from "../components/split.ts";
 import { makeAuthAllowComponent } from "../components/OAuth.ts";
 import { APIConnection, ConnectionService } from "discord.js";
+import optionsToObject from "../../../util/discordUtil/choicesToObj.ts";
 
 // return type in excuting against command
 export interface SplitInfoType {
@@ -13,13 +14,6 @@ export interface SplitInfoType {
     channel_number?: number,
     game?: RegisteredGames,
 }
-function choicesToSplitInfo(choices:ChoicesType):SplitInfoType{
-    return choices.reduce((obj: { [key: string]: string | number }, option: ChoiceType) => {
-        obj[option.name] = option.value
-        return obj
-    }, {})
-}
-
 
 interface CompletedSplitInfoType extends SplitInfoType {
     method:SplitMethod,
@@ -35,12 +29,12 @@ function fillOptions(splitInfo:SplitInfoType):SplitInfoType{
 }
 
 
-const split:RequestHandler = async(req, res) => {
+const splitHandler:RequestHandler = async(req, res) => {
     const {guild_id, data, member} = req.body
     const {user} = member
     
-    const options = data.options as ChoicesType ?? []
-    const splitInformation: SplitInfoType = choicesToSplitInfo(options)
+    const options:ChoicesType = data.options ?? []
+    const splitInformation:SplitInfoType = optionsToObject(options)
     const confirmedSplitInfo = fillOptions(splitInformation)
 
     if (!areOptionsCompleted(confirmedSplitInfo)){ // return component to fill info
@@ -60,7 +54,7 @@ const split:RequestHandler = async(req, res) => {
  
 }
 
-export default split
+export default splitHandler
 
 
 async function getUserConnections(accessToken:string):Promise<APIConnection[]>{
