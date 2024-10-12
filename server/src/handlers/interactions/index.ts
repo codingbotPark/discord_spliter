@@ -24,15 +24,16 @@ function isCommand(commandName:any):commandName is typeof commandSpecification[n
 
 
 const messageComponents:Record<string, MessageComponentObj> = {
-    "split":splitMessageComponent
+    "split":splitMessageComponent,
 }
+/** @example split_requestSplit1_method to {split, requestSplit1_method} */
 function getMessageIDs(customID:string){
     const [messageID, ...componentIDParts] = customID.split("_");
     if (!messageID || !componentIDParts.length) throw Error("Invalid customID");
 
     const componentID = componentIDParts.join("_");
 
-    return {componentID, messageID}
+    return {messageID, componentID}
 }
 function isMessageComponentHandler(componentID:string, messageID:string):boolean{
     return messageID in messageComponents && componentID in messageComponents[messageID];
@@ -56,9 +57,9 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
     } else if (type === InteractionType.MESSAGE_COMPONENT){
         const customID = data.custom_id
         
-        const {componentID, messageID} = getMessageIDs(customID)
+        const {messageID, componentID} = getMessageIDs(customID)
         if(!isMessageComponentHandler(componentID, messageID)){throw Error("unknown message component")}
-
+        messageComponents[messageID][componentID](req,res,next)
     }
 }
 

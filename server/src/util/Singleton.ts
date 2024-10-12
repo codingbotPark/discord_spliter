@@ -1,12 +1,13 @@
 export default class Singleton {
-    protected static instance: Singleton;
+    private static instance: Singleton;
 
-    protected constructor() {
-        // 자식 클래스에서 직접 호출되지 않도록 protected로 설정
-    }
+    // use constructor only in Singleton
+    private constructor() {}
 
-    public static getInstance() {
-        // this를 Singleton의 자식 클래스 타입으로 변경
-        return this.instance || (this.instance = new this());
+    public static getInstance(): Singleton {
+        if (!Singleton.instance) {
+            Singleton.instance = new Singleton();
+        }
+        return Singleton.instance;
     }
 }

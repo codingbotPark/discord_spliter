@@ -5,8 +5,12 @@ import { makeAuthAllowComponent } from "../../handlers/interactions/components/O
 
 class OverwatchGameAPI implements GameAPI{
     splitWithTier(req: Request, res: Response): boolean {
+        console.log(req.body.member.user)
 
         res.send(makeAuthAllowComponent({content:`need allow to access your profile`}))
+
+
+        
 
         return true
     }

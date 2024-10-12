@@ -2,7 +2,9 @@ import { APIActionRowComponent, APIInteractionResponse, ButtonStyle, Component, 
 import { verifiedEnv } from "../../../util/verifyEnv.ts";
 
 
+
 export function makeAuthAllowComponent({content}:{content:string}):APIInteractionResponse{
+
     const clientId = verifiedEnv.CLIENT_ID;
     const redirectUri = encodeURIComponent(verifiedEnv.REDIRECT_URI);
     const scope = 'identify+connections';
@@ -19,8 +21,8 @@ export function makeAuthAllowComponent({content}:{content:string}):APIInteractio
                     components:[
                         {
                             type:ComponentType.Button,
-                            url:discordAuthUrl,
                             label:"allow",
+                            url:discordAuthUrl,
                             style:ButtonStyle.Link
                         }
                     ]

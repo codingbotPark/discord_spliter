@@ -2,16 +2,16 @@ import { RequestHandler } from "express";
 import { HTTPMethod } from "../../util/httpMethod.ts";
 import Handler from "../Handler.ts";
 import { verifiedEnv } from "../../util/verifyEnv.ts";
-import { InteractionResponseType } from "discord.js";
 import path, { dirname } from "path";
 import { fileURLToPath } from 'url';
+import { User } from "discord.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const redirectionGetHandler:RequestHandler = async(req,res) => {
     // there is code after auth redirecting
-    console.log(req)
+    console.log(req.sessionID)
     const code = req.query.code as string;
     if (!code) throw Error("there are no code")
             
@@ -39,7 +39,12 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
     const tokenData = await response.json()
     const accessToken = tokenData.access_token;
 
+
     if (!accessToken){ throw Error("there are no accessToken")}
+
+    // access token 으로 유저 request 보내기
+    const user = await getUser(accessToken)
+    console.log(user)
 
     // save session but EXPECTION = IT's NOT WORK => save session after request in redirectPage
 
@@ -50,3 +55,20 @@ redirectionHandler[HTTPMethod.GET] = redirectionGetHandler
 
 export default redirectionHandler
 
+
+
+async function getUser(accessToken:string):Promise<User>{
+    const userResponse = await fetch('https://discord.com/api/v10/users/@me', {
+        method:HTTPMethod.GET,
+        headers:{
+            'Authorization': `Bearer ${accessToken}`,
+        }
+    })
+
+    if (!userResponse.ok){
+        throw new Error(`Fetching connections failed: ${userResponse.status}`);
+    }
+
+    const user = await userResponse.json()
+    return user as User
+}

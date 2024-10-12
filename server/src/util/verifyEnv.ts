@@ -15,7 +15,6 @@ const zodObject = {
     CLIENT_ID:z.string(),
     CLIENT_SECRET:z.string(),
     REDIRECT_URI:z.string(),
-    INTERACTION_URI:z.string(),
 
     SESSION_KEY:z.string(),
 
@@ -35,7 +34,6 @@ function verifyEnv(envSchema:ZodSchemaType){
         CLIENT_ID:process.env.CLIENT_ID,
         CLIENT_SECRET:process.env.CLIENT_SECRET,
         REDIRECT_URI:process.env.REDIRECT_URI,
-        INTERACTION_URI:process.env.INTERACTION_URI,
 
         SESSION_KEY:process.env.SESSION_KEY,
 
