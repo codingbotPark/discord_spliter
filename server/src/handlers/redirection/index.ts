@@ -11,6 +11,7 @@ const __dirname = dirname(__filename);
 
 const redirectionGetHandler:RequestHandler = async(req,res) => {
     // there is code after auth redirecting
+    console.log(req)
     const code = req.query.code as string;
     if (!code) throw Error("there are no code")
             
@@ -42,7 +43,6 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
 
     // save session but EXPECTION = IT's NOT WORK => save session after request in redirectPage
 
-    console.log(__dirname)
     return res.sendFile(path.join(__dirname, 'redirectPage.html'));
 }
 const redirectionHandler: Handler = {}

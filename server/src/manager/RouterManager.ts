@@ -1,7 +1,6 @@
 import express, { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
-import session from "express-session";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 
 // RouterManager class role = set Routers to app
@@ -21,13 +20,6 @@ class RouterManager extends Manager{
 
     setMiddleWares(app:Express){
         app.use(express.json())
-        app.use(session({ // setting session for saving token
-            secret: verifiedEnv.SESSION_KEY, 
-            resave: false,           // not save for no changing
-            saveUninitialized: true, 
-            cookie: { secure: false } // set true if using https
-
-        }));
     }
 
     confirmRouters(app:Express){

@@ -13,14 +13,12 @@ const gameHandler:RequestHandler = async(req, res) => {
     const api = gameAPI[commandName]
     const optionInformation:gameCommandOption = optionsToObject(options)
 
-    console.log("imhere1",optionInformation)
     if (optionInformation['using'] === undefined){
         // if there are no using, check activity & confirm using
         // if there are no activity, request ti fill
         return res
     }
     const apiResponse = api[optionInformation['using']]?.(req,res)
-    console.log("imhere2", apiResponse)
 
     if (!apiResponse){
         
