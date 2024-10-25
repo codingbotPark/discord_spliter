@@ -4,6 +4,7 @@ import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
 import { Client, Collection, GuildMember } from "discord.js";
 import client from "../util/discordUtil/client.ts";
+import TokenRedis from "../util/TokenRedis.ts";
 
 // ServerManager class role = turn on & off express server
 class ServerManager extends Manager {
@@ -33,6 +34,8 @@ class ServerManager extends Manager {
         this.server?.close(() => {
             // logging for closeing server
         })
+
+        
     }
 
     loginDiscordJS(){

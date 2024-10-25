@@ -11,7 +11,9 @@
         "rootDir": "./src",                   // source path
         // "resolveJsonModule": true,             // import json
         "allowImportingTsExtensions":true,      // to use ESM
-        "noEmit":true,
+        "emitDeclarationOnly": true,
+        "composite": true,
+        "resolveJsonModule": true
     },
     "ts-node": {
         "esm":true, // use ESM

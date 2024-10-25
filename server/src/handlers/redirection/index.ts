@@ -5,13 +5,13 @@ import { verifiedEnv } from "../../util/verifyEnv.ts";
 import path, { dirname } from "path";
 import { fileURLToPath } from 'url';
 import { User } from "discord.js";
+import TokenRedis from "../../util/TokenRedis.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const redirectionGetHandler:RequestHandler = async(req,res) => {
     // there is code after auth redirecting
-    console.log(req.sessionID)
     const code = req.query.code as string;
     if (!code) throw Error("there are no code")
             
@@ -44,10 +44,11 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
 
     // access token 으로 유저 request 보내기
     const user = await getUser(accessToken)
-    console.log(user)
+    if (!user.id){throw Error("fail to get user")}
+    await TokenRedis.getInstance().storeToken(user.id, accessToken)
 
+    
     // save session but EXPECTION = IT's NOT WORK => save session after request in redirectPage
-
     return res.sendFile(path.join(__dirname, 'redirectPage.html'));
 }
 const redirectionHandler: Handler = {}

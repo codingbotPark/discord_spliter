@@ -1,7 +1,6 @@
 import express, { Express, Router } from "express";
 import Manager from "../employee/Manager.ts";
 import { RouterCollector } from "../router/index.ts";
-import { verifiedEnv } from "../util/verifyEnv.ts";
 
 // RouterManager class role = set Routers to app
 class RouterManager extends Manager{

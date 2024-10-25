@@ -8,9 +8,9 @@ import { Request, RequestHandler, Response } from "express";
 
 interface GameAPI{
     // if the game provide match history with players
-    splitWithMatch?(req:Request, res:Response):boolean;
+    splitWithMatch?(req:Request, res:Response):void;
     // if the game provide tier with user ID
-    splitWithTier?(req:Request, res:Response):boolean;
+    splitWithTier?(req:Request, res:Response):void;
 }
 
 

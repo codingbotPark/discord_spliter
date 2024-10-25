@@ -12,7 +12,6 @@ class gameCommandCollector extends Collector<Command, CommandBuilder> {
         // set refer gameAPI
         const games = Object.entries(gameAPI)
         games.forEach(([gameName, gameAPIInstance]: [string, GameAPI]) => {
-            console.log("gameName",gameName)
 
             const splitMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(gameAPIInstance))
 
