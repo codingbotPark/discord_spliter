@@ -23,6 +23,7 @@
     "discord.js": "^14.16.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "overwatch-api": "^0.13.0",
     "redis": "^4.7.0",
     "zod": "^3.23.8"
   },
