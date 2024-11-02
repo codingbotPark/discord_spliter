@@ -2,7 +2,6 @@ import { Server } from "http";
 import { Express } from "express";
 import Manager from "../employee/Manager.ts";
 import { verifiedEnv } from "../util/verifyEnv.ts";
-import { Client, Collection, GuildMember } from "discord.js";
 import client from "../util/discordUtil/client.ts";
 import TokenRedis from "../util/TokenRedis.ts";
 
@@ -28,21 +27,26 @@ class ServerManager extends Manager {
             console.log("listening port " + port)
         })
         this.loginDiscordJS()
+        this.connectRedis()
     }
 
     closeServer(){
         this.server?.close(() => {
             // logging for closeing server
         })
-
-        
     }
 
     loginDiscordJS(){
-        client.login(verifiedEnv.DISCORD_TOKEN)
+        client.login(verifiedEnv.DISCORD_TOKEN).then(() => {
+            console.log("login discord.js")
+        })
     }
-    
 
+    connectRedis(){
+        TokenRedis.getInstance().connect().then(() => {
+            console.log("connect redis")      
+        })
+    }
 
 }
 

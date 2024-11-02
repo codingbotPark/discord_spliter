@@ -3,14 +3,15 @@ import { createClient, RedisClientType } from "redis";
 class TokenRedis {
     private static instance: TokenRedis;
     private redisClient: RedisClientType;
-    private isConnected: boolean = false;  // 연결 상태 체크
+    private isConnected: boolean = false;  // check redis connected
 
     // 생성자에서 Redis 클라이언트 생성
     private constructor() {
         this.redisClient = createClient();
+        console.log("createClient")
     }
 
-    // 싱글톤 인스턴스 반환
+    // singleton
     public static getInstance(): TokenRedis {
         if (!TokenRedis.instance) {
             TokenRedis.instance = new TokenRedis();
@@ -19,7 +20,7 @@ class TokenRedis {
     }
 
     // Redis에 한 번만 연결
-    private async connect(): Promise<void> {
+    public async connect(): Promise<void> {
         if (!this.isConnected) {  // 연결이 안 되어 있을 때만 연결
             try {
                 await this.redisClient.connect();

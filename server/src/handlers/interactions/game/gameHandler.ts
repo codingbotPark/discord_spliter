@@ -18,10 +18,12 @@ const gameHandler:RequestHandler = async(req, res) => {
         // if there are no activity, request ti fill
         return res
     }
+
+    // execute with using
     const apiResponse = api[optionInformation['using']]?.(req,res)
 
     if (!apiResponse){
-        
+        throw Error("hi")
     }
 
     return apiResponse

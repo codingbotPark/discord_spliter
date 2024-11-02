@@ -1,7 +1,6 @@
 
 // index 0 = channel 1 ...
 
-import { Collection, GuildMember } from "discord.js"
 import { Request, RequestHandler, Response } from "express";
 
 // string = discord user id
@@ -11,6 +10,8 @@ interface GameAPI{
     splitWithMatch?(req:Request, res:Response):void;
     // if the game provide tier with user ID
     splitWithTier?(req:Request, res:Response):void;
+
+    eventHandler?(req:Request, res:Response):void
 }
 
 

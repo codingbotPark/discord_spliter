@@ -1,4 +1,4 @@
-import { APIActionRowComponent, APIInteractionResponse, ButtonStyle, Component, ComponentType, InteractionResponseType } from "discord.js";
+import { APIInteractionResponse, ButtonStyle, Component, ComponentType, InteractionResponseType, MessageFlags } from "discord.js";
 import { verifiedEnv } from "../../../util/verifyEnv.ts";
 
 
@@ -14,7 +14,7 @@ export function makeAuthAllowComponent({content}:{content:string}):APIInteractio
     return {
         type:InteractionResponseType.ChannelMessageWithSource,
         data:{
-            content,
+            content:`${content}`,
             components:[
                 {
                     type:ComponentType.ActionRow,
@@ -27,7 +27,8 @@ export function makeAuthAllowComponent({content}:{content:string}):APIInteractio
                         }
                     ]
                 }
-            ]
+            ],
+            flags:MessageFlags.Ephemeral
         }
     }
 }

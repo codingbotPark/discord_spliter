@@ -18,7 +18,7 @@ class RouterManager extends Manager{
     }
 
     setMiddleWares(app:Express){
-        app.use(express.json())
+        // app.use(express.json()) // to not tamper req.body
     }
 
     confirmRouters(app:Express){

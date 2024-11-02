@@ -1,13 +1,15 @@
-import { Request, RequestHandler} from "express"
-import Handler, { MessageComponentObj } from "../Handler"
+import { RequestHandler} from "express"
+import Handler from "../Handler"
 import { HTTPMethod } from "../../util/httpMethod.ts"
 import {  InteractionResponseType, InteractionType } from "discord-interactions";
 import { commandSpecification } from "../../manager/CommandManager.ts";
 import splitHandler from "./split/splitHandler.ts";
-import splitMessageComponent from "./split/splitMessage.ts";
 import test from "./test/test.ts";
 import gameHandler from "./game/gameHandler.ts";
 import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
+import getMessageIDs from "./functions/getMessageIDs.ts";
+import splitEventHandler from "./split/splitMessage.ts";
+import GameAPI from "../../gameAPI/GameAPI.ts";
 
 
 const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {
@@ -23,20 +25,15 @@ function isCommand(commandName:any):commandName is typeof commandSpecification[n
 }
 
 
-const messageComponents:Record<string, MessageComponentObj> = {
-    "split":splitMessageComponent,
-}
-/** @example split_requestSplit1_method to {split, requestSplit1_method} */
-function getMessageIDs(customID:string){
-    const [messageID, ...componentIDParts] = customID.split("_");
-    if (!messageID || !componentIDParts.length) throw Error("Invalid customID");
-
-    const componentID = componentIDParts.join("_");
-
-    return {messageID, componentID}
+const messageComponents:Record<string, RequestHandler> = {
+    "split":splitEventHandler,
+    ...Object.entries(gameAPI).reduce((gameAPIObj:Record<string,RequestHandler>, [key, gameAPI]) => {
+        gameAPIObj[key] = gameAPI.eventHandler ?? function(){}
+        return gameAPIObj
+    }, {})
 }
 function isMessageComponentHandler(componentID:string, messageID:string):boolean{
-    return messageID in messageComponents && componentID in messageComponents[messageID];
+    return messageID in messageComponents && !!componentID;
 }
 
 
@@ -56,10 +53,15 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
 
     } else if (type === InteractionType.MESSAGE_COMPONENT){
         const customID = data.custom_id
+
+        console.log(customID)
         
         const {messageID, componentID} = getMessageIDs(customID)
+        console.log(messageID, componentID)
         if(!isMessageComponentHandler(componentID, messageID)){throw Error("unknown message component")}
-        messageComponents[messageID][componentID](req,res,next)
+
+        
+        messageComponents[messageID](req,res,next)
     }
 }
 

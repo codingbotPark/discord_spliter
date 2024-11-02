@@ -4,8 +4,8 @@ import { SplitMethod } from "../../../command/SplitCommandCollector.ts";
 import { RegisteredGames } from "../../../gameAPI/index.ts";
 import { makeNeedInfoComponent } from "../components/split.ts";
 import { makeAuthAllowComponent } from "../components/OAuth.ts";
-import { APIConnection, ConnectionService } from "discord.js";
 import optionsToObject from "../../../util/discordUtil/choicesToObj.ts";
+import getUserConnections from "../functions/getUserConnections.ts";
 
 // return type in excuting against command
 export interface SplitInfoType {
@@ -55,24 +55,4 @@ const splitHandler:RequestHandler = async(req, res) => {
 }
 
 export default splitHandler
-
-
-async function getUserConnections(accessToken:string):Promise<APIConnection[]>{
-    // Fetch user connections using the access token
-    const connectionsResponse = await fetch('https://discord.com/api/v10/users/@me/connections', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-        },
-    });
-
-    if (!connectionsResponse.ok) {
-        throw new Error(`Fetching connections failed: ${connectionsResponse.status}`);
-    }
-
-    const connections = await connectionsResponse.json();
-    return connections as APIConnection[]
-}
-
-
 

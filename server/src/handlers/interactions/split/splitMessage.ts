@@ -1,8 +1,8 @@
-import { MessageComponentObj } from "../../Handler"
+import { RequestHandler } from "express"
 
 
-const splitMessageComponent:MessageComponentObj = {
-    "submit":() => {}
+const splitEventHandler:RequestHandler = async(req,res) => {
+    
 }
 
-export default splitMessageComponent
+export default splitEventHandler
