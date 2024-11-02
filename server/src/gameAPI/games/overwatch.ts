@@ -11,6 +11,12 @@ import { makeInformConnectionComponent } from "../../handlers/interactions/compo
 import getMessageIDs from "../../handlers/interactions/functions/getMessageIDs.ts";
 import { verifiedEnv } from "../../util/verifyEnv.ts";
 
+import OverwatchAPI from "overwatch-api";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const overwatch = require('overwatch-api');
+
+
 
 class OverwatchGameAPI implements GameAPI{
     async splitWithTier(req: Request, res: Response) {
@@ -56,6 +62,11 @@ class OverwatchGameAPI implements GameAPI{
             if (!currentEmbeds[0]){
                 playerListEmbed.setTitle("overwatch players")
             }
+
+            const platform = 'pc'; // pc/xbl/psn/nintendo-switch
+            const region = 'kr';
+
+            // get overwatch tier
 
             playerListEmbed.addFields({ name: req.body.member.user.global_name, value: 'your tier here', inline: false })
 
