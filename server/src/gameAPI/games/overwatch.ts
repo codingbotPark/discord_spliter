@@ -10,8 +10,7 @@ import { ButtonStyle, ComponentType, ConnectionService, EmbedBuilder, Interactio
 import { makeInformConnectionComponent } from "../../handlers/interactions/components/infromConnect.ts";
 import getMessageIDs from "../../handlers/interactions/functions/getMessageIDs.ts";
 import { verifiedEnv } from "../../util/verifyEnv.ts";
-
-import OverwatchAPI from "overwatch-api";
+import OverwatchAPI, { Profile } from "overwatch-api";
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const overwatch = require('overwatch-api');
@@ -63,12 +62,12 @@ class OverwatchGameAPI implements GameAPI{
                 playerListEmbed.setTitle("overwatch players")
             }
 
-            const platform = 'pc'; // pc/xbl/psn/nintendo-switch
-            const region = 'kr';
+            const profile = await getOverwatchProfile(battleNetConnection.id)
+            // console.log(profile.competitive.damage.rank)
+            // select highest tier
+            const {rankStr, score} = calcRank(profile)
 
-            // get overwatch tier
-
-            playerListEmbed.addFields({ name: req.body.member.user.global_name, value: 'your tier here', inline: false })
+            playerListEmbed.addFields({ name: req.body.member.user.global_name, value: rankStr, inline: false })
 
             return res.send({
                 type:InteractionResponseType.UpdateMessage,
@@ -80,14 +79,6 @@ class OverwatchGameAPI implements GameAPI{
         }
 
     }   
-
-    // res.json({
-    //     type: 4, // CHANNEL_MESSAGE_WITH_SOURCE 응답 타입
-    //     data: {
-    //         content: '버튼을 눌렀군요!',
-    //         flags: 1 << 6 // ephemeral 플래그를 설정하여 유저에게만 보이도록 함
-    //     }
-    // });
 }
 
 export default OverwatchGameAPI
@@ -97,6 +88,78 @@ interface Players {
     id:string;
     tier:string
 }
+
+
+function getOverwatchProfile(battleTag:string):Promise<Profile> {
+return new Promise((resolve, reject) => {
+    const formattedTag = battleTag.replace('#', '-');
+    const platform = 'pc';
+    const region = 'kr';
+
+    OverwatchAPI.getProfile(platform, region, formattedTag, (err, json) => {
+    if (err) {
+        reject(`Error fetching profile:, ${err.message}`);
+    } else {
+        resolve(json)
+    }
+    });
+});
+}
+
+const enum OverwatchPositions {
+    Tank = "tank",
+    Offense = "offense",
+    Support = "support",
+    Open = "open",
+    Unknown = "unknown"
+}
+interface RankObj {
+    position:OverwatchPositions,
+    rank:string
+}
+
+// get highest score with tier
+function calcRank(profile:any){
+    // library wrong => edit number to string
+    // there are no open tier
+    const ranks:RankObj[] = [
+        {position:OverwatchPositions.Tank ,rank:profile.competitive?.tank?.rank}, 
+        {position:OverwatchPositions.Offense ,rank:profile.competitive?.offense?.rank},
+        {position:OverwatchPositions.Support ,rank:profile.competitive?.support?.rank}
+    ]
+
+    
+    const calcObj = ranks.reduce((obj:{rankStr:RankKey, score:number}, curr) => {
+        const rankStr = extractRank(curr.rank)
+        const calcValue = convertRank(rankStr)
+        return calcValue > obj.score ? {rankStr:rankStr, score:calcValue} : obj
+    }, {rankStr:'Unknown', score:0})
+    
+    return calcObj
+}
+
+function extractRank(rankString?:string):RankKey{
+    if (!rankString) return 'Unknown'
+    const rank = rankString.split(" ")[0].split("_")[1]
+    return rank as RankKey
+}
+function convertRank(rank?:string):number{
+    if (!rank) return 0
+    if (!(rank in rankScore)) return 0
+    return rankScore[rank]
+}
+
+const rankScore:{ [key: string]: number } = {
+    'Unknown':0,
+    'Bronze':1,
+    'Silver':2,
+    'Gold':4,
+    'Platinum':6,
+    'Diamond':9,
+    'Master':11,
+    'Grandmaster':14
+} as const
+type RankKey = Extract<keyof typeof rankScore, string>;
 
 
 // 나중엔 tier를 점수화 한 후, splitWithTier 로직을 동일하게 상용하기
