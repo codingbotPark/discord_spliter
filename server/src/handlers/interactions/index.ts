@@ -9,7 +9,6 @@ import gameHandler from "./game/gameHandler.ts";
 import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
 import getMessageIDs from "./functions/getMessageIDs.ts";
 import splitEventHandler from "./split/splitMessage.ts";
-import GameAPI from "../../gameAPI/GameAPI.ts";
 
 
 const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {

@@ -22,18 +22,6 @@ class OverwatchGameAPI implements GameAPI{
         const user = req.body.member.user
 
         return res.send(makePlayerListComponent(user.id))
-        // const accessToken = await TokenRedis.getInstance().fetchToken(req.body.member.user.id)
-
-        // if (!accessToken){
-        //     return res.send(makeAuthAllowComponent({content:`need allow to access your profile`}))
-        // }
-
-        // const connections = await getUserConnections(accessToken)
-        // const battleNetConnection = findConnection(connections, ConnectionService.BattleNet)
-
-        // if (!battleNetConnection){
-        //     return res.send(makeInformConnectionComponent({connectionService:ConnectionService.BattleNet}))
-        // }
     }
 
     async eventHandler(req:Request,res:Response){

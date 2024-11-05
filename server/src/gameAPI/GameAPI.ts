@@ -1,7 +1,7 @@
 
 // index 0 = channel 1 ...
 
-import { Request, RequestHandler, Response } from "express";
+import { Request, Response } from "express";
 
 // string = discord user id
 
