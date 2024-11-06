@@ -24,11 +24,12 @@ abstract class GameAPI{
         if (!strategyName || (action === undefined)){
             throw Error("cannot get action data from body")
         }
-        
+
         const strategy = this.strategy.get(strategyName);
         if (!strategy) {
             throw Error(`Action ${strategyName} is not registered.`);
         }
+        
         strategy.execute(req, res, action);
     }
 

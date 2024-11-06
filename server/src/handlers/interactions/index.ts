@@ -56,7 +56,7 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
             return res
         }
 
-        req.body.action = {strategyName:optionsInformation['using'], action:ResponseStrategyActionType.Message}
+        req.body.action = {strategyName:optionsInformation['using'], action:ResponseStrategyActionType.Command}
         
         applicationCommands[commandName](req,res,next)
 
