@@ -5,17 +5,19 @@ import {  InteractionResponseType, InteractionType } from "discord-interactions"
 import { commandSpecification } from "../../manager/CommandManager.ts";
 import splitHandler from "./split/splitHandler.ts";
 import test from "./test/test.ts";
-import gameHandler from "./game/gameHandler.ts";
 import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
 import getMessageIDs from "./functions/getMessageIDs.ts";
 import splitEventHandler from "./split/splitMessage.ts";
+import { gameCommandOption } from "../../command/gameCommandCollector.ts";
+import optionsToObject from "../../util/discordUtil/choicesToObj.ts";
+import { ResponseStrategyActionType } from "../../model/gameAPI/InteractionResponseExec.ts";
 
 
 const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {
     "test":test,
     "split":splitHandler,
-    ...Object.keys(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, curr:string) => {
-        gameAPIObj[curr] = gameHandler
+    ...Object.entries(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, [key, api]) => {
+        gameAPIObj[key] = api.executeAction
         return gameAPIObj
     }, {})
 }
@@ -26,8 +28,8 @@ function isCommand(commandName:any):commandName is typeof commandSpecification[n
 
 const messageComponents:Record<string, RequestHandler> = {
     "split":splitEventHandler,
-    ...Object.entries(gameAPI).reduce((gameAPIObj:Record<string,RequestHandler>, [key, gameAPI]) => {
-        gameAPIObj[key] = gameAPI.eventHandler ?? function(){}
+    ...Object.entries(gameAPI).reduce((gameAPIObj:Record<string,RequestHandler>, [key, api]) => {
+        gameAPIObj[key] = api.executeAction
         return gameAPIObj
     }, {})
 }
@@ -46,20 +48,27 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
 
     } else if (type === InteractionType.APPLICATION_COMMAND){ // slash
         const commandName = data.name
-
         if(!isCommand(commandName)){throw Error("unknown command")}
+
+        const options = data.options
+        const optionsInformation:gameCommandOption = optionsToObject(options)
+        if (optionsInformation['using'] === undefined){
+            return res
+        }
+
+        req.body.action = {strategyName:optionsInformation['using'], action:ResponseStrategyActionType.Message}
+        
         applicationCommands[commandName](req,res,next)
 
     } else if (type === InteractionType.MESSAGE_COMPONENT){
         const customID = data.custom_id
 
-        console.log(customID)
-        
         const {messageID, componentID} = getMessageIDs(customID)
-        console.log(messageID, componentID)
         if(!isMessageComponentHandler(componentID, messageID)){throw Error("unknown message component")}
 
-        
+        /**@TODO edit using componentID */
+        req.body.action = {strategyName:componentID, action:ResponseStrategyActionType.Message}
+
         messageComponents[messageID](req,res,next)
     }
 }

@@ -1,6 +1,6 @@
 import Collector from "../employee/Collector.ts";
 import gameAPI, { gameNameShortCut } from "../gameAPI/index.ts";
-import GameAPI, { apiNameMap } from "../gameAPI/GameAPI.ts";
+import GameAPI, { strategyNameMap } from "../gameAPI/GameAPI.ts";
 import Command from "./Command/Command.ts";
 import CommandBuilder from "./Command/CommandBuilder.ts";
 import CommandOption, { ChoicesType } from "./Command/CommandOption/CommandOption.ts";
@@ -13,16 +13,14 @@ class gameCommandCollector extends Collector<Command, CommandBuilder> {
         const games = Object.entries(gameAPI)
         games.forEach(([gameName, gameAPIInstance]: [string, GameAPI]) => {
 
-            const splitMethods = Object.getOwnPropertyNames(Object.getPrototypeOf(gameAPIInstance))
+            const splitStrategyEntry = gameAPIInstance.getStrategiesEntry()
 
-            const splitMethodChoices = splitMethods.reduce((choiceArr: ChoicesType, curr) => {
+            const splitMethodChoices = splitStrategyEntry.reduce((choiceArr: ChoicesType, [strategyName, _]) => {
                 // filter api that registered in apiNameMap
-                if (apiNameMap.hasOwnProperty(curr)) {
-                    choiceArr.push({
-                        name: apiNameMap[curr],
-                        value: curr
-                    })
-                }
+                choiceArr.push({
+                    name: strategyNameMap[strategyName],
+                    value: strategyName,
+                })
                 return choiceArr
             }, [])
 

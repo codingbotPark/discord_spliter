@@ -1,26 +1,25 @@
 import { Request, Response } from "express";
-import ResponseExec from "./ResponseExec";
+import ResponseStrategy from "./ResponseStrategy";
 
-abstract class InteractionReponseExec extends ResponseExec{
-
+abstract class InteractionResponseStrategy extends ResponseStrategy{
     
-    execute(req:Request,res:Response,action:ResponseExecActionType, ...data:any[]){
-        if (action === ResponseExecActionType.Interact){
-            this.handleInteract(req,res)
-        } else if (action === ResponseExecActionType.Menu){
-            this.handleMenu(req,res)
+    execute(req:Request,res:Response,action:ResponseStrategyActionType){
+        if (action === ResponseStrategyActionType.Command){
+            this.handleCommand(req,res)
+        } else if (action === ResponseStrategyActionType.Message){
+            this.handleMessage(req,res)
         } else {
-            throw Error("Invalid action type for InteractionReponseExec")
+            throw Error(`Invalid action type for ${this.constructor.name}`)
         }
     }
 
-    abstract handleInteract(req:Request, res:Response): void | Promise<void>
-    abstract handleMenu(req:Request,res:Response):void | Promise<void>
+    abstract handleCommand<T>(req:Request, res:Response, data?:T): void | Promise<void>
+    abstract handleMessage<T>(req:Request,res:Response, data?:T):void | Promise<void>
 }
 
-export default InteractionReponseExec
+export default InteractionResponseStrategy
 
-export const enum ResponseExecActionType{
-    Menu,
-    Interact
+export const enum ResponseStrategyActionType{
+    Message,
+    Command
 }

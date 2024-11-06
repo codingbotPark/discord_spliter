@@ -2,23 +2,63 @@
 // index 0 = channel 1 ...
 
 import { Request, Response } from "express";
+import ResponseStrategy from "../model/gameAPI/ResponseStrategy";
+import { ResponseStrategyActionType } from "../model/gameAPI/InteractionResponseExec";
 
 // string = discord user id
 
-interface GameAPI{
-    // if the game provide match history with players
-    splitWithMatch?(req:Request, res:Response):void;
-    // if the game provide tier with user ID
-    splitWithTier?(req:Request, res:Response):void;
+abstract class GameAPI{
+    private strategy: Map<SplitStrategies, ResponseStrategy> = new Map();
 
-    eventHandler?(req:Request, res:Response):void
+    // 행동 전략을 등록하는 메서드
+    registerAction(strategyName: SplitStrategies, strategy: ResponseStrategy) {
+        console.log("등록", strategyName, strategy)
+        this.strategy.set(strategyName, strategy);
+    }
+
+    // 등록된 행동을 실행하는 메서드
+    executeAction(req:Request, res:Response) {
+
+        const {strategyName, action}:ReqActionData = req.body.action
+        // req 객체에 추가된 strategyName 과 action
+
+        console.log(this.isInStrategy(strategyName))
+        if (!strategyName || (action === undefined)){
+            throw Error("cannot get action data from body")
+        }
+
+        const strategy = this.strategy.get(strategyName);
+        if (!strategy) {
+            throw Error(`Action ${strategyName} is not registered.`);
+        }
+        strategy.execute(req, res, action);
+    }
+
+    isInStrategy(strategyName:string){
+        if (strategyName in SplitStrategies){
+            return this.strategy.has(strategyName as SplitStrategies)
+        }
+        return false
+    }
+
+    getStrategiesEntry(){
+        return Array.from(this.strategy.entries())
+    }
 }
 
 
 export default GameAPI
 
+export enum SplitStrategies{
+    SplitWithTier="splitWithTier",
+    SplitWithMatch="splitWithMatch"
+}
+
 // map for using in user command
-export const apiNameMap:Record<string, string> = {
+export const strategyNameMap:Record<SplitStrategies, string> = {
     "splitWithMatch":"matched member",
     "splitWithTier":"tier, proficiency"
 }
+
+export type ReqActionData = {strategyName:SplitStrategies, action:ResponseStrategyActionType}
+
