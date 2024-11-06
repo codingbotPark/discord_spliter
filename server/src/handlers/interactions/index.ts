@@ -17,7 +17,7 @@ const applicationCommands:Record<typeof commandSpecification[number], RequestHan
     "test":test,
     "split":splitHandler,
     ...Object.entries(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, [key, api]) => {
-        gameAPIObj[key] = api.executeAction
+        gameAPIObj[key] = api.executeAction.bind(api)
         return gameAPIObj
     }, {})
 }
@@ -29,7 +29,7 @@ function isCommand(commandName:any):commandName is typeof commandSpecification[n
 const messageComponents:Record<string, RequestHandler> = {
     "split":splitEventHandler,
     ...Object.entries(gameAPI).reduce((gameAPIObj:Record<string,RequestHandler>, [key, api]) => {
-        gameAPIObj[key] = api.executeAction
+        gameAPIObj[key] = api.executeAction.bind(api)
         return gameAPIObj
     }, {})
 }

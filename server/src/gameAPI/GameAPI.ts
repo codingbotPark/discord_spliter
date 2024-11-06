@@ -12,7 +12,6 @@ abstract class GameAPI{
 
     // 행동 전략을 등록하는 메서드
     registerAction(strategyName: SplitStrategies, strategy: ResponseStrategy) {
-        console.log("등록", strategyName, strategy)
         this.strategy.set(strategyName, strategy);
     }
 
@@ -22,11 +21,10 @@ abstract class GameAPI{
         const {strategyName, action}:ReqActionData = req.body.action
         // req 객체에 추가된 strategyName 과 action
 
-        console.log(this.isInStrategy(strategyName))
         if (!strategyName || (action === undefined)){
             throw Error("cannot get action data from body")
         }
-
+        
         const strategy = this.strategy.get(strategyName);
         if (!strategy) {
             throw Error(`Action ${strategyName} is not registered.`);
