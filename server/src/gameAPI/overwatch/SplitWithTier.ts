@@ -4,62 +4,142 @@ import TokenRedis from "../../util/TokenRedis";
 import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
 import getUserConnections from "../../handlers/interactions/functions/getUserConnections";
 import findConnection from "../../handlers/interactions/functions/filterConnection";
-import { ButtonStyle, ComponentType, ConnectionService, EmbedBuilder, InteractionResponseType } from "discord.js";
+import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService, Embed, EmbedAssertions, EmbedBuilder, EmbedField, InteractionResponseType, Message } from "discord.js";
 import { makeInformConnectionComponent } from "../../handlers/interactions/components/infromConnect";
 import OverwatchAPI, { Profile } from "overwatch-api";
+import { generateCustomID, parseCustomID } from "../../util/customID";
+import { extractNames, taggingNames } from "../../util/extractNames";
+import { RankKey, rankScore } from "..";
+import { OverwatchPositions } from "./overwatch";
+import GameAPI from "../GameAPI";
 
 
 class SplitWithTier extends InteractionResponseStrategy {
+    game:GameAPI
+    constructor(game:GameAPI){
+        super()
+        this.game = game
+    }
+
     handleCommand<T>(req: Request, res: Response, data?: T) {
         const user = req.body.member.user
-        res.send(makePlayerListComponent(user.id))
+        
+        res.send(this.makeComponent(user.id))
         return
     }
 
-    async handleMessage<T>(req: Request, res: Response, data?: T){
-        const accessToken = await TokenRedis.getInstance().fetchToken(req.body.member.user.id)
+    async handleMessage(req: Request, res: Response) {
 
+        const currentUserID = req.body.member.user.id
+        const currentMessage = req.body.message
+        const playerListEmbed = EmbedBuilder.from(currentMessage.embeds[0])
+
+        // find user in list & define join or leave
+        const { fieldIndex, userIndex } = findIndexInPlayerEmbed(currentUserID, playerListEmbed.data.fields)
+        if (userIndex > -1) { // delete user from playerList
+            const fieldList: APIEmbedField[] = playerListEmbed.data.fields! // find userID in field => non null assertion
+            
+            const removedFieldStr = taggingNames(...extractNames(fieldList[fieldIndex].value).toSpliced(userIndex, 1))
+
+            console.log(extractNames(removedFieldStr), currentUserID)
+
+            if (removedFieldStr) {
+                fieldList[fieldIndex].value = removedFieldStr
+                playerListEmbed.setFields(fieldList)
+            } else {
+                playerListEmbed.spliceFields(fieldIndex, 1)
+            }
+            currentMessage.embeds[0] = playerListEmbed.toJSON()
+
+            res.send(this.makeComponent(currentUserID, currentMessage))
+
+            return
+        }
+
+        // check accessToken
+        const accessToken = await TokenRedis.getInstance().fetchToken(req.body.member.user.id)
         if (!accessToken) {
             res.send(makeAuthAllowComponent({ content: `need allow to access your profile for join overwatch` }))
             return
         }
 
+        // check connection
         const connections = await getUserConnections(accessToken)
         const battleNetConnection = findConnection(connections, ConnectionService.BattleNet)
-
         if (!battleNetConnection) {
             res.send(makeInformConnectionComponent({ connectionService: ConnectionService.BattleNet }))
             return
         }
 
-        const currentEmbeds = req.body.message.embeds
-        const playerListEmbed = new EmbedBuilder(currentEmbeds[0])
-
-        if (!currentEmbeds[0]) {
-            playerListEmbed.setTitle("overwatch players")
-        }
-
+        // use overwatch api
         const profile = await getOverwatchProfile(battleNetConnection.id)
-        // console.log(profile.competitive.damage.rank)
-        // select highest tier
-        const { rankStr, score } = calcRank(profile)
+        const { rankStr } = calcRank(profile)
 
-        playerListEmbed.addFields({ name: req.body.member.user.global_name, value: rankStr, inline: false })
-
-        res.send({
-            type: InteractionResponseType.UpdateMessage,
-            data: {
-                // content:
-                embeds: [playerListEmbed],
-            }
-        })
+        // add field current User
+        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === rankStr) ?? -1
+        if (tierIndex === -1){
+            playerListEmbed.addFields({name:rankStr, value:taggingNames(currentUserID)})
+        } else {
+            playerListEmbed.spliceFields(tierIndex,1,
+                {
+                    name:rankStr, 
+                    value:taggingNames(...extractNames(playerListEmbed.data.fields![tierIndex].value), currentUserID)
+                })
+        }
+        
+        currentMessage.embeds[0] = playerListEmbed.toJSON()
+        
+        res.send(this.makeComponent({ name: rankStr, value: currentUserID }, currentMessage))
+        
         return
     }
 
+    private makeComponent(currentUser: APIEmbedField | string, message?: Message) {
+        // basic embed
+    
+        const messageType = message === undefined ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.UpdateMessage
+        const emebds = message?.embeds ?? [this.game.basicEmbed]
+        const currentUserID = (typeof currentUser === "string") ? currentUser : currentUser.value
+        const requestedUserID = (message?.content && extractNames(message.content)[0]) ?? currentUserID
+        
+        return {
+            type: messageType,
+            data: {
+                content: `<@${requestedUserID}> request to split for overwatch\n\u200B`,
+                embeds: emebds,
+                components: [
+                    {
+                        type: ComponentType.ActionRow,
+                        components: [
+                            {
+                                type: ComponentType.Button,
+                                style: ButtonStyle.Primary,
+                                label: "interact",
+                                custom_id: generateCustomID("overwatch", "splitWithTier", "interact")
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+
+
 }
+
 
 export default SplitWithTier
 
+
+function findIndexInPlayerEmbed(userID: string, playerList: APIEmbedField[] = []) {
+    let userIndex = -1
+    const fieldIndex = playerList.findIndex((field) => {
+        userIndex = extractNames(field.value).findIndex((plyaerID) => plyaerID === userID)
+        return userIndex > -1
+    })
+
+    return { fieldIndex, userIndex }
+}
 
 function getOverwatchProfile(battleTag: string): Promise<Profile> {
     return new Promise((resolve, reject) => {
@@ -78,20 +158,14 @@ function getOverwatchProfile(battleTag: string): Promise<Profile> {
 }
 
 
-const enum OverwatchPositions {
-    Tank = "tank",
-    Offense = "offense",
-    Support = "support",
-    Open = "open",
-    Unknown = "unknown"
-}
+
 interface RankObj {
     position: OverwatchPositions,
     rank: string
 }
 
 // get highest score with tier
-function calcRank(profile: any) {
+function calcRank(profile: any):{rankStr:RankKey, score:number} {
     // library wrong => edit number to string
     // there are no open tier
     const ranks: RankObj[] = [
@@ -118,58 +192,9 @@ function extractRank(rankString?: string): RankKey {
 function convertRank(rank?: string): number {
     if (!rank) return 0
     if (!(rank in rankScore)) return 0
-    return rankScore[rank]
-}
-
-
-interface Players {
-    id:string;
-    tier:string
+    return rankScore[rank as RankKey]
 }
 
 
 
-
-const rankScore:{ [key: string]: number } = {
-    'Unknown':0,
-    'Bronze':1,
-    'Silver':2,
-    'Gold':4,
-    'Platinum':6,
-    'Diamond':9,
-    'Master':11,
-    'Grandmaster':14
-} as const
-type RankKey = Extract<keyof typeof rankScore, string>;
-
-
-
-// 나중엔 tier를 점수화 한 후, splitWithTier 로직을 동일하게 상용하기
-export function makePlayerListComponent(userID:string, players:Players[] = []){
-
-    let playerListString = ""
-    if (!!players.length){
-        playerListString = players.map((player, idx) => `${idx}. <@${player.id}> ${player.tier}\n`).join("") + "\u200B"
-    }
-
-    return {
-        type:InteractionResponseType.ChannelMessageWithSource,
-        data:{
-            content:`<@${userID}> request to split for overwatch\n\u200B\n${playerListString}`,
-            components:[
-                {
-                    type:ComponentType.ActionRow,
-                    components:[
-                        {
-                            type:ComponentType.Button,
-                            style:ButtonStyle.Primary,
-                            label:"join",
-                            custom_id:"overwatch_splitWithTier"
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-}
 

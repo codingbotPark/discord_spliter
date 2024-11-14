@@ -45,6 +45,8 @@ const redirectionGetHandler:RequestHandler = async(req,res) => {
     // access token 으로 유저 request 보내기
     const user = await getUser(accessToken)
     if (!user.id){throw Error("fail to get user")}
+    console.log("userID",user.id)
+    console.log("accessToken",accessToken)
     await TokenRedis.getInstance().storeToken(user.id, accessToken)
 
     

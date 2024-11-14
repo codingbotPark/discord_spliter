@@ -6,11 +6,6 @@ import Command from "../command/Command/Command.ts";
 import { HTTPMethod } from "../util/httpMethod.ts";
 import gameAPI from "../gameAPI/index.ts";
 
-export const commandSpecification = [
-    "test",
-    "split",
-    ...Object.keys(gameAPI)
-] as const
 
 // install command to discord guild
 class CommandManager extends Manager {

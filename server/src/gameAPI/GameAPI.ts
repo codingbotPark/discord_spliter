@@ -4,10 +4,14 @@
 import { Request, Response } from "express";
 import ResponseStrategy from "../model/gameAPI/ResponseStrategy";
 import { ResponseStrategyActionType } from "../model/gameAPI/InteractionResponseExec";
+import {  APIEmbed, EmbedData } from "discord.js";
 
 // string = discord user id
 
 abstract class GameAPI{
+    abstract mainColor:number
+    abstract basicEmbed:APIEmbed
+
     private strategy: Map<SplitStrategies, ResponseStrategy> = new Map();
 
     // 행동 전략을 등록하는 메서드
@@ -29,7 +33,7 @@ abstract class GameAPI{
         if (!strategy) {
             throw Error(`Action ${strategyName} is not registered.`);
         }
-        
+
         strategy.execute(req, res, action);
     }
 

@@ -3,11 +3,11 @@ import ResponseStrategy from "./ResponseStrategy";
 
 abstract class InteractionResponseStrategy extends ResponseStrategy{
     
-    execute(req:Request,res:Response,action:ResponseStrategyActionType){
+    async execute(req:Request,res:Response,action:ResponseStrategyActionType){
         if (action === ResponseStrategyActionType.Command){
-            this.handleCommand(req,res)
+            await this.handleCommand(req,res)
         } else if (action === ResponseStrategyActionType.Message){
-            this.handleMessage(req,res)
+            await this.handleMessage(req,res)
         } else {
             throw Error(`Invalid action type for ${this.constructor.name}`)
         }

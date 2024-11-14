@@ -7,7 +7,7 @@ import CommandOption, { ChoicesType } from "./Command/CommandOption/CommandOptio
 
 
 
-class gameCommandCollector extends Collector<Command, CommandBuilder> {
+class GameCommandCollector extends Collector<Command, CommandBuilder> {
     collect(): void {
         // set refer gameAPI
         const games = Object.entries(gameAPI)
@@ -43,7 +43,7 @@ class gameCommandCollector extends Collector<Command, CommandBuilder> {
     }
 }
 
-export default gameCommandCollector
+export default GameCommandCollector
 
 
 export interface gameCommandOption{

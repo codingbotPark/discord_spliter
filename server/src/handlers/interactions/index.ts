@@ -1,19 +1,18 @@
-import { RequestHandler} from "express"
+import { application, RequestHandler} from "express"
 import Handler from "../Handler"
 import { HTTPMethod } from "../../util/httpMethod.ts"
 import {  InteractionResponseType, InteractionType } from "discord-interactions";
-import { commandSpecification } from "../../manager/CommandManager.ts";
 import splitHandler from "./split/splitHandler.ts";
 import test from "./test/test.ts";
 import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
-import getMessageIDs from "./functions/getMessageIDs.ts";
 import splitEventHandler from "./split/splitMessage.ts";
-import { gameCommandOption } from "../../command/gameCommandCollector.ts";
+import { gameCommandOption } from "../../command/GameCommandCollector.ts";
 import optionsToObject from "../../util/discordUtil/choicesToObj.ts";
 import { ResponseStrategyActionType } from "../../model/gameAPI/InteractionResponseExec.ts";
+import { parseCustomID } from "../../util/customID.ts";
 
 
-const applicationCommands:Record<typeof commandSpecification[number], RequestHandler> = {
+const applicationCommands:Record<string, RequestHandler> = {
     "test":test,
     "split":splitHandler,
     ...Object.entries(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, [key, api]) => {
@@ -21,8 +20,8 @@ const applicationCommands:Record<typeof commandSpecification[number], RequestHan
         return gameAPIObj
     }, {})
 }
-function isCommand(commandName:any):commandName is typeof commandSpecification[number]{
-    return commandSpecification.includes(commandName)
+function isCommand(commandName:any):commandName is keyof typeof applicationCommands{
+    return commandName in applicationCommands
 }
 
 
@@ -33,8 +32,8 @@ const messageComponents:Record<string, RequestHandler> = {
         return gameAPIObj
     }, {})
 }
-function isMessageComponentHandler(componentID:string, messageID:string):boolean{
-    return messageID in messageComponents && !!componentID;
+function isMessageComponentHandler(messageName:string):messageName is keyof typeof messageComponents{
+    return messageName in messageComponents;
 }
 
 
@@ -63,13 +62,15 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
     } else if (type === InteractionType.MESSAGE_COMPONENT){
         const customID = data.custom_id
 
-        const {messageID, componentID} = getMessageIDs(customID)
-        if(!isMessageComponentHandler(componentID, messageID)){throw Error("unknown message component")}
+        const [messageName] = parseCustomID(customID)
+        if(!isMessageComponentHandler(messageName)){throw Error("unknown message component")}
+
+        const [action] = parseCustomID(customID, 1)
 
         /**@TODO edit using componentID */
-        req.body.action = {strategyName:componentID, action:ResponseStrategyActionType.Message}
+        req.body.action = {strategyName:action, action:ResponseStrategyActionType.Message}
 
-        messageComponents[messageID](req,res,next)
+        messageComponents[messageName](req,res,next)
     }
 }
 

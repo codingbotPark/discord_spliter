@@ -19,3 +19,18 @@ export type RegisteredGames = keyof typeof gameAPI
 export function isRegisteredGame(game:string):game is RegisteredGames{
     return Object.keys(gameAPI).includes(game)
 }
+
+
+
+export const rankScore = {
+    'Unknown':0,
+    'Bronze':1,
+    'Silver':2,
+    'Gold':4,
+    'Platinum':6,
+    'Diamond':9,
+    'Master':11,
+    'Grandmaster':14
+} as const
+
+export type RankKey = keyof typeof rankScore;
