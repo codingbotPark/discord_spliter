@@ -1,7 +1,7 @@
-import { ConnectionService, InteractionResponseType, MessageFlags } from "discord.js";
+import { ButtonStyle, ComponentType, ConnectionService, InteractionResponseType, MessageFlags } from "discord.js";
 
 
-export function makeInformConnectionComponent({connectionService}:{connectionService:ConnectionService}){
+export function makeInformConnectionComponent({connectionService, unknownButtonCustomID}:{connectionService:ConnectionService, unknownButtonCustomID?:string}){
     
     const content = `${connectionService} is not exist on your profile, please connection ${connectionService}`
     // or assigin temporary
@@ -9,7 +9,15 @@ export function makeInformConnectionComponent({connectionService}:{connectionSer
         type:InteractionResponseType.ChannelMessageWithSource,
         data:{
             content,
-            flags:MessageFlags.Ephemeral
+            flags:MessageFlags.Ephemeral,
+            components:unknownButtonCustomID ?? [
+                {
+                    type:ComponentType.Button,
+                    style:ButtonStyle.Secondary,
+                    label:"join with unknown tier",
+                    custom_id: unknownButtonCustomID
+                }
+            ]
         }
     }
 

@@ -29,6 +29,26 @@ class SplitWithTier extends InteractionResponseStrategy {
     }
 
     async handleMessage(req: Request, res: Response) {
+        const customID = req.body.data.custom_id
+        const [buttonID] = parseCustomID(customID, 2)
+        if (buttonID === "interact"){
+            await this.handleInteract(req,res)
+        } else if (buttonID === "interactWithUnknown"){
+            await this.handleInteractWithUnknown(req,res)
+        }
+    }
+
+    private async handleInteractWithUnknown(req: Request, res: Response){
+        const currentUserID = req.body.memeber.user.id
+        const currentMessage = req.body.message // epermal message
+        const playerListEmbed = EmbedBuilder.from(currentMessage.embeds[0])
+
+        const { fieldIndex, userIndex } = findIndexInPlayerEmbed(currentUserID, playerListEmbed.data.fields)
+        if (userIndex) return res.send()
+
+    }
+
+    private async handleInteract(req: Request, res: Response){
 
         const currentUserID = req.body.member.user.id
         const currentMessage = req.body.message
@@ -40,8 +60,6 @@ class SplitWithTier extends InteractionResponseStrategy {
             const fieldList: APIEmbedField[] = playerListEmbed.data.fields! // find userID in field => non null assertion
             
             const removedFieldStr = taggingNames(...extractNames(fieldList[fieldIndex].value).toSpliced(userIndex, 1))
-
-            console.log(extractNames(removedFieldStr), currentUserID)
 
             if (removedFieldStr) {
                 fieldList[fieldIndex].value = removedFieldStr
@@ -58,6 +76,7 @@ class SplitWithTier extends InteractionResponseStrategy {
 
         // check accessToken
         const accessToken = await TokenRedis.getInstance().fetchToken(req.body.member.user.id)
+        
         if (!accessToken) {
             res.send(makeAuthAllowComponent({ content: `need allow to access your profile for join overwatch` }))
             return
@@ -67,7 +86,7 @@ class SplitWithTier extends InteractionResponseStrategy {
         const connections = await getUserConnections(accessToken)
         const battleNetConnection = findConnection(connections, ConnectionService.BattleNet)
         if (!battleNetConnection) {
-            res.send(makeInformConnectionComponent({ connectionService: ConnectionService.BattleNet }))
+            res.send(makeInformConnectionComponent({ connectionService: ConnectionService.BattleNet, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }))
             return
         }
 
@@ -124,6 +143,11 @@ class SplitWithTier extends InteractionResponseStrategy {
         }
     }
 
+    private makeDeferedUpdateComponent(message:Message){
+        return {
+            type:InteractionResponseType.DeferredMessageUpdate
+        }
+    }   
 
 }
 
@@ -166,12 +190,15 @@ interface RankObj {
 
 // get highest score with tier
 function calcRank(profile: any):{rankStr:RankKey, score:number} {
+    console.log(profile)
+
     // library wrong => edit number to string
     // there are no open tier
     const ranks: RankObj[] = [
         { position: OverwatchPositions.Tank, rank: profile.competitive?.tank?.rank },
         { position: OverwatchPositions.Offense, rank: profile.competitive?.offense?.rank },
-        { position: OverwatchPositions.Support, rank: profile.competitive?.support?.rank }
+        { position: OverwatchPositions.Support, rank: profile.competitive?.support?.rank },
+        { position: OverwatchPositions.Open, rank: profile.competitive?.open?.rank }
     ]
 
 
