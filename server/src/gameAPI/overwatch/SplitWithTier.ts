@@ -4,14 +4,15 @@ import TokenRedis from "../../util/TokenRedis";
 import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
 import getUserConnections from "../../handlers/interactions/functions/getUserConnections";
 import findConnection from "../../handlers/interactions/functions/filterConnection";
-import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService, Embed, EmbedAssertions, EmbedBuilder, EmbedField, InteractionResponseType, Message } from "discord.js";
-import { makeInformConnectionComponent } from "../../handlers/interactions/components/infromConnect";
+import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService, Embed, EmbedAssertions, EmbedBuilder, EmbedField, InteractionResponseType, Message, MessageFlags } from "discord.js";
+import { makeInformUnknownComponent } from "../../handlers/interactions/components/infromConnect";
 import OverwatchAPI, { Profile } from "overwatch-api";
 import { generateCustomID, parseCustomID } from "../../util/customID";
 import { extractNames, taggingNames } from "../../util/extractNames";
 import { RankKey, rankScore } from "..";
 import { OverwatchPositions } from "./overwatch";
 import GameAPI from "../GameAPI";
+import DiscordRequest from "../../util/discordRequest";
 
 
 class SplitWithTier extends InteractionResponseStrategy {
@@ -39,7 +40,7 @@ class SplitWithTier extends InteractionResponseStrategy {
     }
 
     private async handleInteractWithUnknown(req: Request, res: Response){
-        const currentUserID = req.body.memeber.user.id
+        const currentUserID = req.body.member.user.id
         const currentMessage = req.body.message // epermal message
         const playerListEmbed = EmbedBuilder.from(currentMessage.embeds[0])
 
@@ -86,12 +87,36 @@ class SplitWithTier extends InteractionResponseStrategy {
         const connections = await getUserConnections(accessToken)
         const battleNetConnection = findConnection(connections, ConnectionService.BattleNet)
         if (!battleNetConnection) {
-            res.send(makeInformConnectionComponent({ connectionService: ConnectionService.BattleNet, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }))
+            res.send(makeInformUnknownComponent({ contentMessage: `need connection to ${ConnectionService.BattleNet} to join overwatch`, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }))
             return
         }
 
-        // use overwatch api
+
+        const webhookID = currentMessage.webhook_id
+        const webhookToken = req.body.token
+        const messageID = req.body.message.id
+
+        const urlForWebhook = `webhooks/${webhookID}/${webhookToken}`
+        const urlForOrigin = `${urlForWebhook}/messages/${messageID}`
+        const urlForFollowUp = `${urlForWebhook}/messages/@original`
+        
+        
+        // check with defer for crawling
+        const deferredComponent = this.makeDeferredComponent()
+        res.send(deferredComponent)
+
+        
         const profile = await getOverwatchProfile(battleNetConnection.id)
+        // const profile = await getOverwatchProfile("시메원챔#3332")
+        // if profile is private
+        if (!profile) {
+            const originComponent = this.makeComponent(currentUserID, currentMessage)
+            await DiscordRequest(urlForOrigin, { method: "PATCH", body: originComponent })
+            const unknownComponent = makeInformUnknownComponent({ contentMessage: `profile is private`, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }).data
+            await DiscordRequest(urlForWebhook, { method: "POST", body: unknownComponent })
+            return
+        }
+
         const { rankStr } = calcRank(profile)
 
         // add field current User
@@ -107,8 +132,12 @@ class SplitWithTier extends InteractionResponseStrategy {
         }
         
         currentMessage.embeds[0] = playerListEmbed.toJSON()
-        
-        res.send(this.makeComponent({ name: rankStr, value: currentUserID }, currentMessage))
+       
+        console.log(req.body)
+
+        const userAddedComponent = this.makeComponent({ name: rankStr, value: currentUserID }, currentMessage).data
+        await DiscordRequest(urlForOrigin, { method: "PATCH", body: userAddedComponent })
+        await DiscordRequest(urlForFollowUp, { method: "DELETE" })
         
         return
     }
@@ -143,12 +172,15 @@ class SplitWithTier extends InteractionResponseStrategy {
         }
     }
 
-    private makeDeferedUpdateComponent(message:Message){
+    private makeDeferredComponent(){ 
         return {
-            type:InteractionResponseType.DeferredMessageUpdate
+            type:InteractionResponseType.DeferredChannelMessageWithSource,
+            data:{
+                content:"in processing...",
+                flags:MessageFlags.Ephemeral
+            }
         }
-    }   
-
+    }
 }
 
 
@@ -165,19 +197,23 @@ function findIndexInPlayerEmbed(userID: string, playerList: APIEmbedField[] = []
     return { fieldIndex, userIndex }
 }
 
-function getOverwatchProfile(battleTag: string): Promise<Profile> {
-    return new Promise((resolve, reject) => {
-        const formattedTag = battleTag.replace('#', '-');
-        const platform = 'pc';
-        const region = 'kr';
-
+function getOverwatchProfile(battleTag: string): Promise<Profile | null> {
+    const formattedTag = battleTag.replace('#', '-');
+    const platform = 'pc';
+    const region = 'kr';
+    
+    return new Promise<Profile | null>((resolve, reject) => {
         OverwatchAPI.getProfile(platform, region, formattedTag, (err, json) => {
             if (err) {
-                reject(`Error fetching profile:, ${err.message}`);
+                // API 에러 처리
+                resolve(null); // 또는 reject(`Error fetching profile: ${err.message}`);
             } else {
-                resolve(json)
+                resolve(json);
             }
         });
+    }).catch(error => {
+        console.error(error);
+        return null;
     });
 }
 
@@ -190,7 +226,6 @@ interface RankObj {
 
 // get highest score with tier
 function calcRank(profile: any):{rankStr:RankKey, score:number} {
-    console.log(profile)
 
     // library wrong => edit number to string
     // there are no open tier
@@ -221,7 +256,3 @@ function convertRank(rank?: string): number {
     if (!(rank in rankScore)) return 0
     return rankScore[rank as RankKey]
 }
-
-
-
-
