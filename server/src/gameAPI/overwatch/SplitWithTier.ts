@@ -4,7 +4,7 @@ import TokenRedis from "../../util/TokenRedis";
 import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
 import getUserConnections from "../../handlers/interactions/functions/getUserConnections";
 import findConnection from "../../handlers/interactions/functions/filterConnection";
-import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService, Embed, EmbedAssertions, EmbedBuilder, EmbedField, InteractionResponseType, Message, MessageFlags } from "discord.js";
+import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService,  EmbedBuilder, InteractionResponseType, Message, MessageFlags } from "discord.js";
 import { makeInformUnknownComponent } from "../../handlers/interactions/components/infromConnect";
 import OverwatchAPI, { Profile } from "overwatch-api";
 import { generateCustomID, parseCustomID } from "../../util/customID";
@@ -40,13 +40,66 @@ class SplitWithTier extends InteractionResponseStrategy {
     }
 
     private async handleInteractWithUnknown(req: Request, res: Response){
+        const ephemeralMessage = req.body.message // epermal message
+        const referenceMessageInfo = ephemeralMessage.message_reference
+        console.log("ephemeralMessage", req.body)
+        if (!referenceMessageInfo) {
+            res.send(this.makeReplyComponent())
+            // somthing wrong
+            return
+        }
+
+        // define seeds
         const currentUserID = req.body.member.user.id
-        const currentMessage = req.body.message // epermal message
-        const playerListEmbed = EmbedBuilder.from(currentMessage.embeds[0])
+        const originMessageID = referenceMessageInfo.message_id
+
+        // get origin message
+        // const urlForOrigin = `webhooks/${webhookID}/${webhookToken}/messages/@original`;
+        const urlForOrigin = `channels/${ephemeralMessage.channel_id}/messages/${originMessageID}`;
+        const originMessage = await DiscordRequest(urlForOrigin, { method: "GET" })
+            .then((res) => res.json())
+            .catch((err) => {
+                console.log("Failed to fetch original message:", err);
+                return null;  // 에러 시 null 반환
+            });
+        if (!originMessage || !originMessage.embeds || !originMessage.embeds[0]) {
+            console.log("Original message or embeds not found");
+            res.send(this.makeReplyComponent());
+            return;
+        }
+
+
+        const playerListEmbed = EmbedBuilder.from(originMessage.embeds[0]);
+        const originMessageWebhookID = originMessage.webhook_id
+        const originMessageWebhookToken = originMessage.token
+
+        // const urlForWebhook = `webhooks/${webhookID}/${webhookToken}`
+        // const urlForOrigin = `${urlForWebhook}/messages/${messageID}`
+        // const urlForFollowUp = `${urlForWebhook}/messages/@original`
 
         const { fieldIndex, userIndex } = findIndexInPlayerEmbed(currentUserID, playerListEmbed.data.fields)
-        if (userIndex) return res.send()
+        // when user is already in list
+        if (userIndex > -1) {
+            res.send(this.makeReplyComponent())
+            return
+        }
 
+        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === "unknown") ?? -1
+         
+        // when unknown field is not exist
+        if (tierIndex === -1){
+            playerListEmbed.addFields({name:"unknown", value:taggingNames(currentUserID)})
+        } else {
+            playerListEmbed.spliceFields(tierIndex,1,
+            {
+                name:"unknown", value:taggingNames(...extractNames(playerListEmbed.data.fields![tierIndex].value), currentUserID)
+            })
+        }
+        // this.makeComponent(currentUserID, originMessage)
+        originMessage.embeds[0] = playerListEmbed.toJSON()
+        await DiscordRequest(urlForOrigin, { method: "PATCH", body: this.makeComponent(currentUserID, originMessage).data })
+        res.send(this.makeReplyComponent())
+        return
     }
 
     private async handleInteract(req: Request, res: Response){
@@ -150,7 +203,7 @@ class SplitWithTier extends InteractionResponseStrategy {
         const currentUserID = (typeof currentUser === "string") ? currentUser : currentUser.value
         const requestedUserID = (message?.content && extractNames(message.content)[0]) ?? currentUserID
         
-        return {
+        return { 
             type: messageType,
             data: {
                 content: `<@${requestedUserID}> request to split for overwatch\n\u200B`,
@@ -179,6 +232,13 @@ class SplitWithTier extends InteractionResponseStrategy {
                 content:"in processing...",
                 flags:MessageFlags.Ephemeral
             }
+        }
+    }
+
+    private makeReplyComponent(){
+        return {
+            type:InteractionResponseType.UpdateMessage,
+            data:{} // nothing
         }
     }
 }
