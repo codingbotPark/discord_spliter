@@ -15,6 +15,8 @@ abstract class InteractionResponseStrategy extends ResponseStrategy{
 
     abstract handleCommand<T>(req:Request, res:Response, data?:T): void | Promise<void>
     abstract handleMessage<T>(req:Request,res:Response, data?:T):void | Promise<void>
+
+    abstract maxPeopleNumber:number | undefined
 }
 
 export default InteractionResponseStrategy

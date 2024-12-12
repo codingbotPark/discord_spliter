@@ -1,5 +1,5 @@
 import {  APIEmbed, EmbedBuilder, EmbedData } from "discord.js";
-import GameAPI, { SplitStrategies } from "../GameAPI.ts";
+import GameAPI, { SplitStrategies } from "../../GameAPI.ts";
 import SplitWithTier from "./SplitWithTier.ts";
 
 
@@ -9,10 +9,6 @@ class OverwatchSplitAPI extends GameAPI{
     .setColor(this.mainColor)
     .setTitle("overwatch players")
     .data
-    
-    constructor(){
-        super()
-    }
 }
 const overwatchSplitAPI = new OverwatchSplitAPI()
 overwatchSplitAPI.registerAction(SplitStrategies.SplitWithTier, new SplitWithTier(overwatchSplitAPI))
@@ -20,6 +16,7 @@ overwatchSplitAPI.registerAction(SplitStrategies.SplitWithTier, new SplitWithTie
 export default overwatchSplitAPI
 
 
+export type OverwatchRanks = "unknown" | "bronze" | "silver" | "gold" | "platinum" | "diamond" | "Master" | "Grandmaster" | "Top"
 export const enum OverwatchPositions {
     Tank = "tank",
     Offense = "offense",
@@ -27,3 +24,14 @@ export const enum OverwatchPositions {
     Open = "open",
     Unknown = "unknown"
 }
+export const overwatchRankKind:Record<OverwatchRanks, {priority:number}> = {
+    "unknown":{priority:0},
+    "bronze":{priority:1},
+    "silver":{priority:2},
+    "gold":{priority:3},
+    "platinum":{priority:5},
+    "diamond":{priority:7},
+    "Master":{priority:9},
+    "Grandmaster":{priority:11},
+    "Top":{priority:13},
+} 

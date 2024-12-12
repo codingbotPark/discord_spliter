@@ -1,22 +1,26 @@
 import { Request, Response } from "express";
-import InteractionResponseStrategy from "../../model/gameAPI/InteractionResponseExec";
-import TokenRedis from "../../util/TokenRedis";
-import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
-import getUserConnections from "../../handlers/interactions/functions/getUserConnections";
-import findConnection from "../../handlers/interactions/functions/filterConnection";
+import InteractionResponseStrategy from "../../../model/gameAPI/InteractionResponseExec";
+import TokenRedis from "../../../util/TokenRedis";
+import { makeAuthAllowComponent } from "../../../handlers/interactions/components/OAuth";
+import getUserConnections from "../../../handlers/interactions/functions/getUserConnections";
+import findConnection from "../../../handlers/interactions/functions/filterConnection";
 import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService,  EmbedBuilder, InteractionResponseType, Message, MessageFlags } from "discord.js";
-import { makeInformUnknownComponent } from "../../handlers/interactions/components/infromConnect";
+import { makeInformUnknownComponent } from "../../../handlers/interactions/components/infromConnect";
 import OverwatchAPI, { Profile } from "overwatch-api";
-import { generateCustomID, parseCustomID } from "../../util/customID";
-import { extractNames, taggingNames } from "../../util/extractNames";
-import { RankKey, rankScore } from "..";
-import { OverwatchPositions } from "./overwatch";
-import GameAPI from "../GameAPI";
-import DiscordRequest from "../../util/discordRequest";
-
+import { generateCustomID, parseCustomID } from "../../../util/customID";
+import { extractNames, taggingNames } from "../../../util/extractNames";
+import { RankKey, rankScore } from "../..";
+import { OverwatchPositions, overwatchRankKind } from "./overwatch";
+import GameAPI from "../../GameAPI";
+import DiscordRequest from "../../../util/discordRequest";
+import RankSystem from "../../gameSystem/RankSystem";
 
 class SplitWithTier extends InteractionResponseStrategy {
+
+    maxPeopleNumber: number = 10;
     game:GameAPI
+    rankSystem = new RankSystem(overwatchRankKind)
+    
     constructor(game:GameAPI){
         super()
         this.game = game
@@ -40,22 +44,10 @@ class SplitWithTier extends InteractionResponseStrategy {
     }
 
     private async handleInteractWithUnknown(req: Request, res: Response){
-        const ephemeralMessage = req.body.message // epermal message
-        const referenceMessageInfo = ephemeralMessage.message_reference
-        console.log("ephemeralMessage", req.body)
-        if (!referenceMessageInfo) {
-            res.send(this.makeReplyComponent())
-            // somthing wrong
-            return
-        }
-
-        // define seeds
-        const currentUserID = req.body.member.user.id
-        const originMessageID = referenceMessageInfo.message_id
-
         // get origin message
-        // const urlForOrigin = `webhooks/${webhookID}/${webhookToken}/messages/@original`;
-        const urlForOrigin = `channels/${ephemeralMessage.channel_id}/messages/${originMessageID}`;
+        const urlForOrigin = `channels/${req.body.message.channel_id}/messages/${req.body.message.message_reference.message_id}`;
+        const urlForEphmeral = `/webhooks/${req.body.application_id}/${req.body.token}/messages/${req.body.message.id}`;
+
         const originMessage = await DiscordRequest(urlForOrigin, { method: "GET" })
             .then((res) => res.json())
             .catch((err) => {
@@ -69,23 +61,17 @@ class SplitWithTier extends InteractionResponseStrategy {
         }
 
 
+        const currentUserID = req.body.member.user.id
         const playerListEmbed = EmbedBuilder.from(originMessage.embeds[0]);
-        const originMessageWebhookID = originMessage.webhook_id
-        const originMessageWebhookToken = originMessage.token
-
-        // const urlForWebhook = `webhooks/${webhookID}/${webhookToken}`
-        // const urlForOrigin = `${urlForWebhook}/messages/${messageID}`
-        // const urlForFollowUp = `${urlForWebhook}/messages/@original`
-
         const { fieldIndex, userIndex } = findIndexInPlayerEmbed(currentUserID, playerListEmbed.data.fields)
         // when user is already in list
         if (userIndex > -1) {
+            await DiscordRequest(urlForEphmeral, { method: "DELETE" }) 
             res.send(this.makeReplyComponent())
             return
         }
 
         const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === "unknown") ?? -1
-         
         // when unknown field is not exist
         if (tierIndex === -1){
             playerListEmbed.addFields({name:"unknown", value:taggingNames(currentUserID)})
@@ -97,8 +83,10 @@ class SplitWithTier extends InteractionResponseStrategy {
         }
         // this.makeComponent(currentUserID, originMessage)
         originMessage.embeds[0] = playerListEmbed.toJSON()
+
         await DiscordRequest(urlForOrigin, { method: "PATCH", body: this.makeComponent(currentUserID, originMessage).data })
         res.send(this.makeReplyComponent())
+        await DiscordRequest(urlForEphmeral, { method: "DELETE" }) 
         return
     }
 
@@ -142,7 +130,11 @@ class SplitWithTier extends InteractionResponseStrategy {
         if (!battleNetConnection) {
             res.send(makeInformUnknownComponent({ contentMessage: `need connection to ${ConnectionService.BattleNet} to join overwatch`, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }))
             return
-        }
+        }        
+        
+        // defer for crawling
+        const deferredComponent = this.makeDeferredComponent()
+        res.send(deferredComponent)
 
 
         const webhookID = currentMessage.webhook_id
@@ -151,20 +143,14 @@ class SplitWithTier extends InteractionResponseStrategy {
 
         const urlForWebhook = `webhooks/${webhookID}/${webhookToken}`
         const urlForOrigin = `${urlForWebhook}/messages/${messageID}`
-        const urlForFollowUp = `${urlForWebhook}/messages/@original`
-        
-        
-        // check with defer for crawling
-        const deferredComponent = this.makeDeferredComponent()
-        res.send(deferredComponent)
+        const urlForEphmeral = `${urlForWebhook}/messages/@original`
 
         
         const profile = await getOverwatchProfile(battleNetConnection.id)
         // const profile = await getOverwatchProfile("시메원챔#3332")
+
         // if profile is private
         if (!profile) {
-            const originComponent = this.makeComponent(currentUserID, currentMessage)
-            await DiscordRequest(urlForOrigin, { method: "PATCH", body: originComponent })
             const unknownComponent = makeInformUnknownComponent({ contentMessage: `profile is private`, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }).data
             await DiscordRequest(urlForWebhook, { method: "POST", body: unknownComponent })
             return
@@ -186,11 +172,10 @@ class SplitWithTier extends InteractionResponseStrategy {
         
         currentMessage.embeds[0] = playerListEmbed.toJSON()
        
-        console.log(req.body)
 
         const userAddedComponent = this.makeComponent({ name: rankStr, value: currentUserID }, currentMessage).data
         await DiscordRequest(urlForOrigin, { method: "PATCH", body: userAddedComponent })
-        await DiscordRequest(urlForFollowUp, { method: "DELETE" })
+        await DiscordRequest(urlForEphmeral, { method: "DELETE" })
         
         return
     }
@@ -279,17 +264,14 @@ function getOverwatchProfile(battleTag: string): Promise<Profile | null> {
 
 
 
-interface RankObj {
-    position: OverwatchPositions,
-    rank: string
-}
+
 
 // get highest score with tier
 function calcRank(profile: any):{rankStr:RankKey, score:number} {
 
     // library wrong => edit number to string
     // there are no open tier
-    const ranks: RankObj[] = [
+    const ranks = [
         { position: OverwatchPositions.Tank, rank: profile.competitive?.tank?.rank },
         { position: OverwatchPositions.Offense, rank: profile.competitive?.offense?.rank },
         { position: OverwatchPositions.Support, rank: profile.competitive?.support?.rank },
