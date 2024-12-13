@@ -2,7 +2,8 @@ import { ChoicesType, ChoiceType } from "../../command/Command/CommandOption/Com
 
 
 /** @TODO make to generic return type */
-function optionsToObject<T extends ChoiceType>(options: T[]): Record<T['name'], T['value']> {
+function optionsToObject<T extends ChoiceType>(options: T[] | undefined): Record<T['name'], T['value']> | null{
+    if (!options) return null
     return options.reduce((acc, curr) => {
         acc[curr.name] = curr.value;
         return acc;

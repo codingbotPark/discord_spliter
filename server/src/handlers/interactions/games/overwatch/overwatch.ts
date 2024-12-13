@@ -1,6 +1,6 @@
 import {  APIEmbed, EmbedBuilder, EmbedData } from "discord.js";
-import GameAPI, { SplitStrategies } from "../../GameAPI.ts";
-import SplitWithTier from "./SplitWithTier.ts";
+import GameAPI, { SplitStrategies } from "../../../../gameAPI/GameAPI.ts";
+import SplitWithTier from "../../../../core/strategy/SplitWithTier.ts";
 
 
 class OverwatchSplitAPI extends GameAPI{

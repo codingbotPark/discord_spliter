@@ -2,19 +2,16 @@ import { application, RequestHandler} from "express"
 import Handler from "../Handler"
 import { HTTPMethod } from "../../util/httpMethod.ts"
 import {  InteractionResponseType, InteractionType } from "discord-interactions";
-import splitHandler from "./split/splitHandler.ts";
 import test from "./test/test.ts";
 import gameAPI, { RegisteredGames } from "../../gameAPI/index.ts";
-import splitEventHandler from "./split/splitMessage.ts";
 import { gameCommandOption } from "../../command/GameCommandCollector.ts";
-import optionsToObject from "../../util/discordUtil/choicesToObj.ts";
 import { ResponseStrategyActionType } from "../../model/gameAPI/InteractionResponseExec.ts";
 import { parseCustomID } from "../../util/customID.ts";
+import optionsToObject from "../../util/choicesToObj.ts";
 
 
 const applicationCommands:Record<string, RequestHandler> = {
     "test":test,
-    "split":splitHandler,
     ...Object.entries(gameAPI).reduce((gameAPIObj:Record<RegisteredGames, RequestHandler>, [key, api]) => {
         gameAPIObj[key] = api.executeAction.bind(api)
         return gameAPIObj
@@ -26,7 +23,6 @@ function isCommand(commandName:any):commandName is keyof typeof applicationComma
 
 
 const messageComponents:Record<string, RequestHandler> = {
-    "split":splitEventHandler,
     ...Object.entries(gameAPI).reduce((gameAPIObj:Record<string,RequestHandler>, [key, api]) => {
         gameAPIObj[key] = api.executeAction.bind(api)
         return gameAPIObj
@@ -36,7 +32,7 @@ function isMessageComponentHandler(messageName:string):messageName is keyof type
     return messageName in messageComponents;
 }
 
-
+// classifiy with discord interaction type
 const interactionClassifier:RequestHandler =  (req , res, next) => {
     
     // interaction type
@@ -50,12 +46,13 @@ const interactionClassifier:RequestHandler =  (req , res, next) => {
         if(!isCommand(commandName)){throw Error("unknown command")}
 
         const options = data.options
-        const optionsInformation:gameCommandOption = optionsToObject(options)
-        if (optionsInformation['using'] === undefined){
-            return res
+        const optionsInformation:gameCommandOption | null = optionsToObject(options)
+        
+        // 함께 들어온 options이 있을 때만 부여
+        console.log(req.body)
+        if(optionsInformation && optionsInformation['using']){
+            req.body.action = {strategyName:optionsInformation['using'], action:ResponseStrategyActionType.Command}
         }
-
-        req.body.action = {strategyName:optionsInformation['using'], action:ResponseStrategyActionType.Command}
         
         applicationCommands[commandName](req,res,next)
 

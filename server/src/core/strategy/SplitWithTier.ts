@@ -1,25 +1,22 @@
 import { Request, Response } from "express";
-import InteractionResponseStrategy from "../../../model/gameAPI/InteractionResponseExec";
-import TokenRedis from "../../../util/TokenRedis";
-import { makeAuthAllowComponent } from "../../../handlers/interactions/components/OAuth";
-import getUserConnections from "../../../handlers/interactions/functions/getUserConnections";
-import findConnection from "../../../handlers/interactions/functions/filterConnection";
+import InteractionResponseStrategy from "../../model/gameAPI/InteractionResponseExec";
+import TokenRedis from "../../util/TokenRedis";
+import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
 import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService,  EmbedBuilder, InteractionResponseType, Message, MessageFlags } from "discord.js";
-import { makeInformUnknownComponent } from "../../../handlers/interactions/components/infromConnect";
+import { makeInformUnknownComponent } from "../../handlers/interactions/components/infromConnect";
 import OverwatchAPI, { Profile } from "overwatch-api";
-import { generateCustomID, parseCustomID } from "../../../util/customID";
-import { extractNames, taggingNames } from "../../../util/extractNames";
-import { RankKey, rankScore } from "../..";
-import { OverwatchPositions, overwatchRankKind } from "./overwatch";
-import GameAPI from "../../GameAPI";
-import DiscordRequest from "../../../util/discordRequest";
-import RankSystem from "../../gameSystem/RankSystem";
+import { generateCustomID, parseCustomID } from "../../util/customID";
+import { extractNames, taggingNames } from "../../util/extractNames";
+import { RankKey, rankScore } from "../../gameAPI";
+import { OverwatchPositions } from "../../handlers/interactions/games/overwatch/overwatch";
+import GameAPI from "../../gameAPI/GameAPI";
+import DiscordRequest from "../../util/discordRequest";
+import { findConnection, getUserConnections } from "../../util/discordConnections";
 
 class SplitWithTier extends InteractionResponseStrategy {
 
     maxPeopleNumber: number = 10;
     game:GameAPI
-    rankSystem = new RankSystem(overwatchRankKind)
     
     constructor(game:GameAPI){
         super()
