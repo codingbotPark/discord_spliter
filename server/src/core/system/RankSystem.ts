@@ -2,15 +2,22 @@
 
 class RankSystem<Ranks extends Record<string, {priority:number}>>{
     
-    constructor(RankKind:Ranks){
-        this.RankKind = RankKind
+    rankKind:Ranks 
+    constructor(rankKind:Ranks){
+        this.rankKind = rankKind
     }
 
-    private RankKind:Ranks 
 
     convertRankToScore(rank:string):number {
-        return this.RankKind[rank].priority
+        return this.rankKind[rank].priority
     }
+
+    convertRank(rank?: string): number {
+        if (!rank) return 0
+        if (!(rank in this.rankKind)) return 0
+        return this.rankKind[rank].priority
+    }
+
     splitWithRankEvenly<T extends Player>(players:T[], teamNumber:number): Array<Player[]> {
 
         if (teamNumber < 1 || teamNumber > players.length) {throw Error("out of range parameter")}
@@ -31,8 +38,6 @@ class RankSystem<Ranks extends Record<string, {priority:number}>>{
 
         return teams
     }
-
-
 
 }
 

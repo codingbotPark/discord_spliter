@@ -7,21 +7,19 @@ import { makeInformUnknownComponent } from "../../handlers/interactions/componen
 import OverwatchAPI, { Profile } from "overwatch-api";
 import { generateCustomID, parseCustomID } from "../../util/customID";
 import { extractNames, taggingNames } from "../../util/extractNames";
-import { RankKey, rankScore } from "../../gameAPI";
 import { OverwatchPositions } from "../../handlers/interactions/games/overwatch/overwatch";
 import GameAPI from "../../gameAPI/GameAPI";
 import DiscordRequest from "../../util/discordRequest";
 import { findConnection, getUserConnections } from "../../util/discordConnections";
 
-class SplitWithTier extends InteractionResponseStrategy {
+abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy {
+    abstract connectionService:ConnectionService;
+    abstract maxPeopleNumber: number | undefined;
+    abstract game:GameAPI
 
-    maxPeopleNumber: number = 10;
-    game:GameAPI
+    abstract getProfileWithConnectionID(id:string):Promise<ProfileType | null>
+    abstract getRankFromProfile(profile:ProfileType):{rank:string} 
     
-    constructor(game:GameAPI){
-        super()
-        this.game = game
-    }
 
     handleCommand<T>(req: Request, res: Response, data?: T) {
         const user = req.body.member.user
@@ -87,6 +85,7 @@ class SplitWithTier extends InteractionResponseStrategy {
         return
     }
 
+
     private async handleInteract(req: Request, res: Response){
 
         const currentUserID = req.body.member.user.id
@@ -117,15 +116,15 @@ class SplitWithTier extends InteractionResponseStrategy {
         const accessToken = await TokenRedis.getInstance().fetchToken(req.body.member.user.id)
         
         if (!accessToken) {
-            res.send(makeAuthAllowComponent({ content: `need allow to access your profile for join overwatch` }))
+            res.send(makeAuthAllowComponent({ content: `need allow to access your profile for join ${this.game.gameName}` }))
             return
         }
 
         // check connection
         const connections = await getUserConnections(accessToken)
-        const battleNetConnection = findConnection(connections, ConnectionService.BattleNet)
+        const battleNetConnection = findConnection(connections, this.connectionService)
         if (!battleNetConnection) {
-            res.send(makeInformUnknownComponent({ contentMessage: `need connection to ${ConnectionService.BattleNet} to join overwatch`, unknownButtonCustomID:generateCustomID("overwatch", "splitWithTier", "interactWithUnknown") }))
+            res.send(makeInformUnknownComponent({ contentMessage: `need connection to ${this.connectionService} to join ${this.game.gameName}`, unknownButtonCustomID:generateCustomID(this.game.gameName, "splitWithTier", "interactWithUnknown") }))
             return
         }        
         
@@ -143,8 +142,8 @@ class SplitWithTier extends InteractionResponseStrategy {
         const urlForEphmeral = `${urlForWebhook}/messages/@original`
 
         
-        const profile = await getOverwatchProfile(battleNetConnection.id)
-        // const profile = await getOverwatchProfile("시메원챔#3332")
+        const profile = await this.getProfileWithConnectionID(battleNetConnection.id)
+        // const profile = await this.getProfileWithConnectionID("시메원챔#3332")
 
         // if profile is private
         if (!profile) {
@@ -153,16 +152,16 @@ class SplitWithTier extends InteractionResponseStrategy {
             return
         }
 
-        const { rankStr } = calcRank(profile)
+        const { rank } = this.getRankFromProfile(profile)
 
         // add field current User
-        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === rankStr) ?? -1
+        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === rank) ?? -1
         if (tierIndex === -1){
-            playerListEmbed.addFields({name:rankStr, value:taggingNames(currentUserID)})
+            playerListEmbed.addFields({name:rank, value:taggingNames(currentUserID)})
         } else {
             playerListEmbed.spliceFields(tierIndex,1,
                 {
-                    name:rankStr, 
+                    name:rank, 
                     value:taggingNames(...extractNames(playerListEmbed.data.fields![tierIndex].value), currentUserID)
                 })
         }
@@ -170,7 +169,7 @@ class SplitWithTier extends InteractionResponseStrategy {
         currentMessage.embeds[0] = playerListEmbed.toJSON()
        
 
-        const userAddedComponent = this.makeComponent({ name: rankStr, value: currentUserID }, currentMessage).data
+        const userAddedComponent = this.makeComponent({ name: rank, value: currentUserID }, currentMessage).data
         await DiscordRequest(urlForOrigin, { method: "PATCH", body: userAddedComponent })
         await DiscordRequest(urlForEphmeral, { method: "DELETE" })
         
@@ -188,7 +187,7 @@ class SplitWithTier extends InteractionResponseStrategy {
         return { 
             type: messageType,
             data: {
-                content: `<@${requestedUserID}> request to split for overwatch\n\u200B`,
+                content: `<@${requestedUserID}> request to split for ${this.game.gameName}\n\u200B`,
                 embeds: emebds,
                 components: [
                     {
@@ -198,7 +197,7 @@ class SplitWithTier extends InteractionResponseStrategy {
                                 type: ComponentType.Button,
                                 style: ButtonStyle.Primary,
                                 label: "interact",
-                                custom_id: generateCustomID("overwatch", "splitWithTier", "interact")
+                                custom_id: generateCustomID(this.game.gameName, "splitWithTier", "interact")
                             }
                         ]
                     }
@@ -223,10 +222,13 @@ class SplitWithTier extends InteractionResponseStrategy {
             data:{} // nothing
         }
     }
+
+    
+
 }
 
 
-export default SplitWithTier
+export default SplitWithProfile
 
 
 function findIndexInPlayerEmbed(userID: string, playerList: APIEmbedField[] = []) {
@@ -239,59 +241,4 @@ function findIndexInPlayerEmbed(userID: string, playerList: APIEmbedField[] = []
     return { fieldIndex, userIndex }
 }
 
-function getOverwatchProfile(battleTag: string): Promise<Profile | null> {
-    const formattedTag = battleTag.replace('#', '-');
-    const platform = 'pc';
-    const region = 'kr';
-    
-    return new Promise<Profile | null>((resolve, reject) => {
-        OverwatchAPI.getProfile(platform, region, formattedTag, (err, json) => {
-            if (err) {
-                // API 에러 처리
-                resolve(null); // 또는 reject(`Error fetching profile: ${err.message}`);
-            } else {
-                resolve(json);
-            }
-        });
-    }).catch(error => {
-        console.error(error);
-        return null;
-    });
-}
 
-
-
-
-
-// get highest score with tier
-function calcRank(profile: any):{rankStr:RankKey, score:number} {
-
-    // library wrong => edit number to string
-    // there are no open tier
-    const ranks = [
-        { position: OverwatchPositions.Tank, rank: profile.competitive?.tank?.rank },
-        { position: OverwatchPositions.Offense, rank: profile.competitive?.offense?.rank },
-        { position: OverwatchPositions.Support, rank: profile.competitive?.support?.rank },
-        { position: OverwatchPositions.Open, rank: profile.competitive?.open?.rank }
-    ]
-
-
-    const calcObj = ranks.reduce((obj: { rankStr: RankKey, score: number }, curr) => {
-        const rankStr = extractRank(curr.rank)
-        const calcValue = convertRank(rankStr)
-        return calcValue > obj.score ? { rankStr: rankStr, score: calcValue } : obj
-    }, { rankStr: 'Unknown', score: 0 })
-
-    return calcObj
-}
-
-function extractRank(rankString?: string): RankKey {
-    if (!rankString) return 'Unknown'
-    const rank = rankString.split(" ")[0].split("_")[1]
-    return rank as RankKey
-}
-function convertRank(rank?: string): number {
-    if (!rank) return 0
-    if (!(rank in rankScore)) return 0
-    return rankScore[rank as RankKey]
-}

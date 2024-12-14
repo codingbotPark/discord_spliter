@@ -10,6 +10,7 @@ import {  APIEmbed, EmbedData } from "discord.js";
 
 abstract class GameAPI{
     abstract mainColor:number
+    abstract gameName:string
     abstract basicEmbed:APIEmbed
 
     private strategy: Map<SplitStrategies, ResponseStrategy> = new Map();
@@ -20,6 +21,7 @@ abstract class GameAPI{
     }
 
     // 등록된 행동을 실행하는 메서드
+    // executeAction(this:GameAPI ,req:Request, res:Response) {
     executeAction(req:Request, res:Response) {
 
         const {strategyName, action}:ReqActionData = req.body.action
