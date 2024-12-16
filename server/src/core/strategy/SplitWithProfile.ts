@@ -4,13 +4,12 @@ import TokenRedis from "../../util/TokenRedis";
 import { makeAuthAllowComponent } from "../../handlers/interactions/components/OAuth";
 import { APIEmbedField, ButtonStyle, ComponentType, ConnectionService,  EmbedBuilder, InteractionResponseType, Message, MessageFlags } from "discord.js";
 import { makeInformUnknownComponent } from "../../handlers/interactions/components/infromConnect";
-import OverwatchAPI, { Profile } from "overwatch-api";
 import { generateCustomID, parseCustomID } from "../../util/customID";
 import { extractNames, taggingNames } from "../../util/extractNames";
-import { OverwatchPositions } from "../../handlers/interactions/games/overwatch/overwatch";
 import GameAPI from "../../gameAPI/GameAPI";
 import DiscordRequest from "../../util/discordRequest";
 import { findConnection, getUserConnections } from "../../util/discordConnections";
+import { Player } from "../system/RankSystem";
 
 abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy {
     abstract connectionService:ConnectionService;
@@ -19,6 +18,7 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
 
     abstract getProfileWithConnectionID(id:string):Promise<ProfileType | null>
     abstract getRankFromProfile(profile:ProfileType):{rank:string} 
+    abstract splitCoreLogic(players:Player[]):Array<Player[]>
     
 
     handleCommand<T>(req: Request, res: Response, data?: T) {
@@ -35,6 +35,8 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
             await this.handleInteract(req,res)
         } else if (buttonID === "interactWithUnknown"){
             await this.handleInteractWithUnknown(req,res)
+        } else if (buttonID === "split"){
+            await this.handleSplit(req, res)
         }
     }
 
@@ -66,14 +68,14 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
             return
         }
 
-        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === "unknown") ?? -1
+        const tierIndex = playerListEmbed.data.fields?.findIndex((field) => field.name === "Unknown") ?? -1
         // when unknown field is not exist
         if (tierIndex === -1){
-            playerListEmbed.addFields({name:"unknown", value:taggingNames(currentUserID)})
+            playerListEmbed.addFields({name:"Unknown", value:taggingNames(currentUserID)})
         } else {
             playerListEmbed.spliceFields(tierIndex,1,
             {
-                name:"unknown", value:taggingNames(...extractNames(playerListEmbed.data.fields![tierIndex].value), currentUserID)
+                name:"Unknown", value:taggingNames(...extractNames(playerListEmbed.data.fields![tierIndex].value), currentUserID)
             })
         }
         // this.makeComponent(currentUserID, originMessage)
@@ -176,11 +178,73 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
         return
     }
 
+    private async handleSplit(req:Request, res:Response){
+        const currentMessage = req.body.message
+        const playerListEmbed = EmbedBuilder.from(currentMessage.embeds[0])
+
+        const players:Player[] | undefined = playerListEmbed.data.fields?.flatMap((field) => 
+            extractNames(field.value).map((id) => ({userID:id, rank:field.name})))
+
+        // there are no players
+        if (!players) return
+
+        const splittedPlayers = this.splitCoreLogic(players) 
+
+        res.send(this.makePlayerListComponent(splittedPlayers))
+        return 
+    }
+
+    private makePlayerListComponent(players:Array<Player[]>, message?:Message){
+        const embeds = message?.embeds ?? [this.game.basicEmbed]
+        const embedBuilder = EmbedBuilder.from(embeds[0])
+
+        const fields = players.flatMap((playerGroup, idx) => (
+            [{
+                name:`Group ${idx + 1}`,
+                value:playerGroup.map((player) => `<@${player.userID}>`).join("\n"),
+                inline:true
+            },{
+                name:"\u0009",
+                value:"\u0009",
+                inline:true
+            }]
+        ))
+
+        // clear embeds & set with players
+        embedBuilder.setFields(fields)
+        embeds[0] = embedBuilder.toJSON()
+
+        return {
+            type:InteractionResponseType.UpdateMessage,
+            data:{
+                embeds:embeds,
+                components:[
+                    {
+                        type:ComponentType.ActionRow,
+                        components:[
+                            {
+                                type:ComponentType.Button,
+                                style:ButtonStyle.Primary,
+                                label:"Accept",
+                                custom_id: generateCustomID(this.game.gameName, "splitWithTier", "acceptSplit")
+                            },{
+                                type:ComponentType.Button,
+                                style:ButtonStyle.Danger,
+                                label:"Cancel",
+                                custom_id: generateCustomID(this.game.gameName, "splitWithTier", "cancelSplit")
+                            },
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+
     private makeComponent(currentUser: APIEmbedField | string, message?: Message) {
         // basic embed
     
         const messageType = message === undefined ? InteractionResponseType.ChannelMessageWithSource : InteractionResponseType.UpdateMessage
-        const emebds = message?.embeds ?? [this.game.basicEmbed]
+        const embeds = message?.embeds ?? [this.game.basicEmbed]
         const currentUserID = (typeof currentUser === "string") ? currentUser : currentUser.value
         const requestedUserID = (message?.content && extractNames(message.content)[0]) ?? currentUserID
         
@@ -188,7 +252,7 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
             type: messageType,
             data: {
                 content: `<@${requestedUserID}> request to split for ${this.game.gameName}\n\u200B`,
-                embeds: emebds,
+                embeds: embeds,
                 components: [
                     {
                         type: ComponentType.ActionRow,
@@ -198,6 +262,11 @@ abstract class SplitWithProfile<ProfileType> extends InteractionResponseStrategy
                                 style: ButtonStyle.Primary,
                                 label: "interact",
                                 custom_id: generateCustomID(this.game.gameName, "splitWithTier", "interact")
+                            }, {
+                                type:ComponentType.Button,
+                                style:ButtonStyle.Secondary,
+                                label:"split",
+                                custom_id:generateCustomID(this.game.gameName, "splitWithTier", "split")
                             }
                         ]
                     }

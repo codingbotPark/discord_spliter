@@ -1,8 +1,8 @@
 import { ConnectionService } from "discord.js";
-import GameAPI from "../../../../gameAPI/GameAPI";
 import OverwatchAPI, { Profile } from "overwatch-api";
 import SplitWithProfile from "../../../../core/strategy/SplitWithProfile";
 import { OverwatchPositions, OverwatchRanks, OverwatchSplitAPI } from "./overwatch";
+import { Player } from "../../../../core/system/RankSystem";
 
 class OverwatchSplitWithProfile extends SplitWithProfile<Profile>{
     connectionService=ConnectionService.BattleNet
@@ -12,6 +12,10 @@ class OverwatchSplitWithProfile extends SplitWithProfile<Profile>{
     constructor(game:OverwatchSplitAPI){
         super()
         this.game = game
+    }
+
+    splitCoreLogic(players: Player[]): Array<Player[]> {
+        return this.game.rankSystem.splitWithRankEvenly(players, 2)
     }
     
     getProfileWithConnectionID(id:string):Promise<Profile | null>{
@@ -48,7 +52,7 @@ class OverwatchSplitWithProfile extends SplitWithProfile<Profile>{
         // get highest rank
         const calcObj = ranks.reduce((obj: { rank:OverwatchRanks , score: number }, curr) => {
             const rank = this.extractRank(curr.rank)
-            const calcValue = this.game.rankSystem.convertRank(rank)
+            const calcValue = this.game.rankSystem.convertRankToScore(rank)
             return calcValue > obj.score ? { rank: rank, score: calcValue } : obj
         }, { rank: 'Unknown', score: 0 })
 

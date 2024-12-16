@@ -9,14 +9,11 @@ class RankSystem<Ranks extends Record<string, {priority:number}>>{
 
 
     convertRankToScore(rank:string):number {
-        return this.rankKind[rank].priority
-    }
-
-    convertRank(rank?: string): number {
         if (!rank) return 0
         if (!(rank in this.rankKind)) return 0
         return this.rankKind[rank].priority
     }
+
 
     splitWithRankEvenly<T extends Player>(players:T[], teamNumber:number): Array<Player[]> {
 
@@ -41,7 +38,7 @@ class RankSystem<Ranks extends Record<string, {priority:number}>>{
 
 }
 
-type Player = {userID:string ,rank:string}
+export type Player = {userID:string ,rank:string}
 
 
 export default RankSystem
